@@ -1,0 +1,13 @@
+{
+    "name": "grephac",
+    "fullName": "grephac",
+    "id": "jid1-QZ6EKWOqRNjbLQ",
+    "description": "a basic add-on",
+    "author": "David Bruant",
+    "dependencies": ["api-utils", "addon-kit"],
+
+    "main": "main",
+    "lib": "lib",
+    "license": "MIT",
+    "version": "0.1"
+}

@@ -1,0 +1,6 @@
+# Knowing where an object is from in source:
+
+* Analyze source code to see where they are created
+* Set breakpoints are these places and know where to find the new Debugger.Object
+* When found, attach infos to it (WeakMap)
+* When appearing in the graph, get the info and show it
