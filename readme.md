@@ -1,4 +1,4 @@
-# usefulStackTrace
+# OoI
 
 A little addon to visualize object graphs in Firefox.
 
