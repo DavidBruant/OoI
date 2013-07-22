@@ -41,15 +41,9 @@ var gDevTools = devtools.gDevTools;
 
 var data = self.data;
 
-var d3Source = data.load('d3/d3.v3.js');
-var forceSource = data.load('d3/force.js');
-
 
 var build = (frame, target) => {
     var panel = new OoIPanel(frame, target);
-
-    /*evalWithContext(d3Source, frame);
-    evalWithContext(forceSource, frame);*/
 
     return panel.open();
 }
