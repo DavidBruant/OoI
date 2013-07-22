@@ -3,28 +3,33 @@
 "use strict";
 
 import timers = require('timers');
+import tabs = require('tabs');
+import self = require("self");
+
 var setTimeout = timers.setTimeout;
-var console = {
+
+// For whatever reason, there is no console available in this addon (wtf!)
+/*var console = {
     log: function (...args){
-        setTimeout( () => {throw new Error(args.map((a)=>String(a)).join(' '))} , 10);
+        var argsStr = args.map((a)=>String(a)).join(' ');
+        setTimeout( () => {throw new Error(argsStr)} , 10);
     }
-};
+};*/
 
 import getObjectCreationsLocations = require('getObjectCreationsLocations');
+import evalWithContext = require('evalWithContext');
 
 import getSDKTabContentWindow = require('getSDKTabContentWindow');
 import sdkTabToXulTab = require('sdkTabToXulTab');
 import devToolsOpen = require('devToolsOpen');
-
-import tabs = require('tabs');
-
+import OoIPanel = require('OoIPanel');
 import chr = require("chrome");
+
 var Cu = chr.Cu;
 
+//var addDebuggerToGlobal = Cu.import("resource://gre/modules/jsdebugger.jsm").addDebuggerToGlobal;
+//addDebuggerToGlobal(this); // Ignore TypeScript compiler warning for here
 
-
-var addDebuggerToGlobal = Cu.import("resource://gre/modules/jsdebugger.jsm").addDebuggerToGlobal;
-addDebuggerToGlobal(this); // Ignore TypeScript compiler warning for here
 
 
 //console.log('typeof Debugger', typeof Debugger)
@@ -33,20 +38,24 @@ var devtools = Cu.import("resource:///modules/devtools/gDevTools.jsm");
 
 var gDevTools = devtools.gDevTools;
 
-class OoIPanel{
-    constructor(frame, target : DevToolsTarget){
 
-    }
-
-    open(){
-
-    }
-}
-
-import self = require("self");
 var data = self.data;
 
-function main(){
+var d3Source = data.load('d3/d3.v3.js');
+var forceSource = data.load('d3/force.js');
+
+
+var build = (frame, target) => {
+    var panel = new OoIPanel(frame, target);
+
+    /*evalWithContext(d3Source, frame);
+    evalWithContext(forceSource, frame);*/
+
+    return panel.open();
+}
+
+
+export function main(){
 
     console.log('before registerTool')
     gDevTools.registerTool({
@@ -58,13 +67,11 @@ function main(){
         isTargetSupported: function(target){
             return true;
         },
-        build: function (frame, target) {
-            var panel = new OoIPanel(frame, target);
-            return panel.open();
-        }
-
+        build: build
 
     });
+
+    // figure out if there is a way to unregister a tool
     console.log('after registerTool');
 
     /*
@@ -93,7 +100,7 @@ function main(){
             //console.log('scripts.length', scripts.length);
             console.log('script keys', Object.getOwnPropertyNames(Debugger.Script.prototype))
             scripts.forEach(function(s){
-                if(s.url === null)
+                if(s.implementsurl === null)
                     return; // why does that happens sometimes?
 
                 var source = s.source;
@@ -123,5 +130,6 @@ function main(){
 
 
 // drawGraph( traverse( globalDebugObject ) )
-declare var module;
-module.exports.main = main
+
+//declare var module;
+//module.exports.main = main

@@ -6,6 +6,9 @@ module.exports = function(grunt) {
         xpi: {
             // TODO create xpi task
         },
+        "cfx-test": {
+            // cfx -b /home/david/Logiciel/aurora/firefox run ooi.xpi
+        },
 		typescript: {
 			base: {
 				src: ['**/*.ts'],

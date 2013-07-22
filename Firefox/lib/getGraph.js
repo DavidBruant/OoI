@@ -1,7 +1,7 @@
 "use strict";
 
 // LIBRARY
-
+/*
 const {Cu} = require("chrome");
 const { addDebuggerToGlobal } = Cu.import("resource://gre/modules/jsdebugger.jsm");
 addDebuggerToGlobal(this);
@@ -84,22 +84,22 @@ dbg.uncaughtExceptionHook = function(e){
 
 
 
-/*
 
- var getObjectId = (function(){
- var wm = new WeakMap();
- var id = 1;
 
- return function (frame){
- if(wm.has(frame))
- return wm.get(frame);
- else{
- wm.set(frame, id);
- return id++;
- }
- };
- })();
- */
+// var getObjectId = (function(){
+// var wm = new WeakMap();
+// var id = 1;
+//
+// return function (frame){
+// if(wm.has(frame))
+// return wm.get(frame);
+// else{
+// wm.set(frame, id);
+// return id++;
+// }
+// };
+// })();
+
 
 
 
