@@ -1,6 +1,5 @@
-"use strict";
-
-document.addEventListener('DOMContentLoaded', e => {
+(global => {
+    "use strict";
 
     var width = 1000,
         height = 400;
@@ -14,48 +13,10 @@ document.addEventListener('DOMContentLoaded', e => {
         .charge(-60)
         .on("tick", tick);
 
-    var svg = d3.select("body").append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .on("mousemove", mousemove)
-        .on("mousedown", mousedown);
-
-    svg.append("rect")
-        .attr("width", width)
-        .attr("height", height);
-
     var nodes = force.nodes(),
-        links = force.links(),
-        node = svg.selectAll(".node"),
-        link = svg.selectAll(".link");
-
-    var cursor = svg.append("circle")
-        .attr("r", 30)
-        .attr("transform", "translate(-100,-100)")
-        .attr("class", "cursor");
-
-    restart();
-
-    function mousemove() {
-        cursor.attr("transform", "translate(" + d3.mouse(this) + ")");
-    }
-
-    function mousedown() {
-        var point = d3.mouse(this),
-            node = {x: point[0], y: point[1]},
-            n = nodes.push(node);
-
-        // add links to any nearby nodes
-        nodes.forEach(function(target) {
-            var x = target.x - node.x,
-                y = target.y - node.y;
-            if (Math.sqrt(x * x + y * y) < 30) {
-                links.push({source: node, target: target});
-            }
-        });
-
-        restart();
-    }
+        links = force.links();
+    var node,
+        link;
 
     function tick() {
         link.attr("x1", function(d) { return d.source.x; })
@@ -83,4 +44,40 @@ document.addEventListener('DOMContentLoaded', e => {
         force.start();
     }
 
-})
+    document.addEventListener('DOMContentLoaded', e => {
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        svg.append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+        node = svg.selectAll(".node");
+        link = svg.selectAll(".link");
+
+        restart();
+    });
+
+    document.defaultView.graphViz = {
+        addNodes: function(newNodes){
+            Array.prototype.push.apply(nodes, newNodes); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
+            restart();
+        },
+        addEdges: function (newEdges){
+            Array.prototype.push.apply(links, newEdges); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
+            restart();
+        },
+        nodes: nodes
+    };
+
+    document.addEventListener('toHTML', e => {
+        console.log('message in HTML', e.data);
+
+        var e = new Event('fromHTML');
+        e.data = 'pong';
+        document.dispatchEvent(e);
+    })
+
+})(this);

@@ -7,6 +7,7 @@ import tabs = require('tabs');
 import self = require("self");
 
 var setTimeout = timers.setTimeout;
+var setInterval = timers.setInterval;
 
 // For whatever reason, there is no console available in this addon (wtf!)
 /*var console = {
@@ -42,9 +43,63 @@ var gDevTools = devtools.gDevTools;
 var data = self.data;
 
 
+
+
+function randInt1_n(max){
+    return Math.floor(Math.random()*max);
+}
+
+var P = Object.getPrototypeOf;
+function allKeys(o){
+    console.group()
+    while(o !== null){
+        console.log(Object.getOwnPropertyNames(o))
+        o = P(o)
+    }
+    console.groupEnd()
+}
+
+allKeys(this)
+
+
 var build = (frame, target) => {
     var panel = new OoIPanel(frame, target);
 
+    frame.document.addEventListener('DOMContentLoaded', e => {
+
+        frame.addEventListener('fromHTML', e => {
+            console.log('fromHTML', e.data)
+        })
+
+        setInterval( () => {
+            var e = new frame.Event('toHTML');
+            e.data = 'ping';
+            frame.dispatchEvent(e);
+
+
+
+
+            /*var n = {
+                x: randInt1_n(1000),
+                y: randInt1_n(400)
+            };
+            graphViz.addNodes([n]);
+
+            var k = randInt1_n(Math.sqrt(graphViz.nodes.length)/2);
+            var links = [];
+
+            for(var i = 0 ; i < k ; i++){
+                var target = graphViz.nodes[randInt1_n(graphViz.nodes.length)];
+
+                links.push({source: n, target: target});
+            }
+
+            graphViz.addEdges(links);*/
+
+
+        }, 500)
+
+    });
     return panel.open();
 }
 
