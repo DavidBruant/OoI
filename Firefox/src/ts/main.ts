@@ -63,12 +63,14 @@ function allKeys(o){
     console.groupEnd()
 }
 
-function fakeRequestAnimationFrame(callback){
-    setTimeout(callback, 17)
-}
+
 
 var build = (frame, target) => {
     var panel = new OoIPanel(frame, target);
+
+    function fakeRequestAnimationFrame(callback){ // what it takes to get it working -_-#
+        frame.requestAnimationFrame(callback)
+    }
 
     frame.document.addEventListener('DOMContentLoaded', e => {
         var overrides = <any> {
@@ -91,7 +93,7 @@ var build = (frame, target) => {
             };
             graphViz.addNodes([n]);
 
-            var k = randInt1_n(Math.sqrt(graphViz.nodes.length)/2);
+            var k = randInt1_n(Math.sqrt(graphViz.nodes.length)*2/3);
             var links = [];
 
             for(var i = 0 ; i < k ; i++){
@@ -106,6 +108,9 @@ var build = (frame, target) => {
         }, 500)
 
     });
+
+
+
     return panel.open();
 }
 
