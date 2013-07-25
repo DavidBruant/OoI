@@ -4,7 +4,7 @@
 
 // TODO consider moving this file out of TypeScript
 
-function evalWithContext(source: string, context){
+function evalWithContext(source: string, context, overrides){
 
 
     var getObjectId = (function(){
@@ -26,16 +26,27 @@ function evalWithContext(source: string, context){
     }
 
     var handler = {
-        /*get: (t, n)=>{
-            console.log(getObjectId(t), 'get trap', n);
+        get: (t, n)=>{
+            console.log('get trap', n);
+            if(n in overrides)
+                return overrides[n];
+
             var v = t[n];
-            return v;//Object(v) === v ? wrap(v) : v;
-        }*/
+            if(v === t)
+                return p;
+
+            return v;
+        },
+        set: (t, n, v) => {
+            return overrides[n] = v;
+        },
+        has: (t, n) => {
+            return n in t || n in overrides;
+        }
     };
 
 
     var p = wrap(context);
-
 
     with(p){
         eval(source);

@@ -8,6 +8,8 @@ import self = require("self");
 
 var setTimeout = timers.setTimeout;
 var setInterval = timers.setInterval;
+var clearTimeout = timers.clearTimeout;
+var clearInterval = timers.clearInterval;
 
 // For whatever reason, there is no console available in this addon (wtf!)
 /*var console = {
@@ -42,6 +44,8 @@ var gDevTools = devtools.gDevTools;
 
 var data = self.data;
 
+var d3Source = data.load('d3/d3.v3.js');
+var forceSource = data.load('d3/force.js');
 
 
 
@@ -59,27 +63,29 @@ function allKeys(o){
     console.groupEnd()
 }
 
-allKeys(this)
-
+function fakeRequestAnimationFrame(callback){
+    setTimeout(callback, 17)
+}
 
 var build = (frame, target) => {
     var panel = new OoIPanel(frame, target);
 
     frame.document.addEventListener('DOMContentLoaded', e => {
+        var overrides = <any> {
+            setTimeout: setTimeout,
+            clearTimeout: clearTimeout,
+            requestAnimationFrame: fakeRequestAnimationFrame
+        };
+        overrides.global = overrides;
 
-        frame.addEventListener('fromHTML', e => {
-            console.log('fromHTML', e.data)
-        })
+        evalWithContext(d3Source, frame, overrides);
+        evalWithContext(forceSource, frame, overrides);
+
+        var graphViz = overrides.graphViz
 
         setInterval( () => {
-            var e = new frame.Event('toHTML');
-            e.data = 'ping';
-            frame.dispatchEvent(e);
 
-
-
-
-            /*var n = {
+            var n = {
                 x: randInt1_n(1000),
                 y: randInt1_n(400)
             };
@@ -94,7 +100,7 @@ var build = (frame, target) => {
                 links.push({source: n, target: target});
             }
 
-            graphViz.addEdges(links);*/
+            graphViz.addEdges(links);
 
 
         }, 500)

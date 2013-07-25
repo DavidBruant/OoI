@@ -1,4 +1,4 @@
-(global => {
+( () => {
     "use strict";
 
     var width = 1000,
@@ -29,6 +29,7 @@
     }
 
     function restart() {
+
         link = link.data(links);
 
         link.enter().insert("line", ".node")
@@ -44,7 +45,7 @@
         force.start();
     }
 
-    document.addEventListener('DOMContentLoaded', e => {
+    //document.addEventListener('DOMContentLoaded', e => {
 
         var svg = d3.select("body").append("svg")
             .attr("width", width)
@@ -58,9 +59,9 @@
         link = svg.selectAll(".link");
 
         restart();
-    });
+    //});
 
-    document.defaultView.graphViz = {
+    global.graphViz = {
         addNodes: function(newNodes){
             Array.prototype.push.apply(nodes, newNodes); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
             restart();
@@ -72,12 +73,4 @@
         nodes: nodes
     };
 
-    document.addEventListener('toHTML', e => {
-        console.log('message in HTML', e.data);
-
-        var e = new Event('fromHTML');
-        e.data = 'pong';
-        document.dispatchEvent(e);
-    })
-
-})(this);
+})();
