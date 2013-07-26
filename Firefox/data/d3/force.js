@@ -2,13 +2,13 @@
     "use strict";
 
     var width = 1000,
-        height = 400;
+        height = 600;
 
     var fill = d3.scale.category20();
 
     var force = d3.layout.force()
         .size([width, height])
-        .nodes([{}]) // initialize with a single node
+        .nodes([]) // initialize with a single node
         .linkDistance(30)
         .charge(-60)
         .on("tick", tick);
@@ -60,6 +60,8 @@
 
         restart();
     //});
+
+    console.log('typeof global from force',typeof global);
 
     global.graphViz = {
         addNodes: function(newNodes){

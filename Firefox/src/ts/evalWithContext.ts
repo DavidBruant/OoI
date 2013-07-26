@@ -27,7 +27,6 @@ function evalWithContext(source: string, context, overrides){
 
     var handler = {
         get: (t, n)=>{
-            console.log('get trap', n);
             if(n in overrides)
                 return overrides[n];
 

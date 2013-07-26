@@ -47,7 +47,7 @@ interface TargetFactoryStatic{
 }
 
 interface DevToolsTarget{
-
+    tab: XulTab
 }
 
 interface DevToolDescription{

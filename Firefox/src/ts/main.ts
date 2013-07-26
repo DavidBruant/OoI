@@ -24,15 +24,16 @@ import evalWithContext = require('evalWithContext');
 
 import getSDKTabContentWindow = require('getSDKTabContentWindow');
 import sdkTabToXulTab = require('sdkTabToXulTab');
+import utils = require("tabs/utils");
+var getXULTabContentWindow = utils.getTabContentWindow;
+
 import devToolsOpen = require('devToolsOpen');
 import OoIPanel = require('OoIPanel');
 import chr = require("chrome");
 
+import traverseGraph = require('traverseGraph')
+
 var Cu = chr.Cu;
-
-//var addDebuggerToGlobal = Cu.import("resource://gre/modules/jsdebugger.jsm").addDebuggerToGlobal;
-//addDebuggerToGlobal(this); // Ignore TypeScript compiler warning for here
-
 
 
 //console.log('typeof Debugger', typeof Debugger)
@@ -65,8 +66,11 @@ function allKeys(o){
 
 
 
-var build = (frame, target) => {
-    var panel = new OoIPanel(frame, target);
+var build = (frame, toolbox) => {
+    var panel = new OoIPanel(frame, toolbox);
+    var tab = toolbox.target.tab;
+    var targetGlobal = getXULTabContentWindow(tab);
+
 
     function fakeRequestAnimationFrame(callback){ // what it takes to get it working -_-#
         frame.requestAnimationFrame(callback)
@@ -83,29 +87,65 @@ var build = (frame, target) => {
         evalWithContext(d3Source, frame, overrides);
         evalWithContext(forceSource, frame, overrides);
 
-        var graphViz = overrides.graphViz
+        var graphViz = overrides.graphViz;
 
-        setInterval( () => {
+        frame.document.querySelector('button').addEventListener('click', e => {
+            var button = e.target;
+            // cleanup
+            //frame.document.body.textContent = '';
+            // put the button back in
+            //frame.document.appendChild(button);
 
-            var n = {
-                x: randInt1_n(1000),
-                y: randInt1_n(400)
-            };
-            graphViz.addNodes([n]);
+            var dbgObjectsToD3Objects = new WeakMap();
+            var d3Nodes = [];
 
-            var k = randInt1_n(Math.sqrt(graphViz.nodes.length)*2/3);
-            var links = [];
+            traverseGraph(targetGlobal, {
+                addNode: function(o){
+                    var d3Node = {
+                        x: randInt1_n(1000),
+                        y: randInt1_n(400)
+                    };
 
-            for(var i = 0 ; i < k ; i++){
-                var target = graphViz.nodes[randInt1_n(graphViz.nodes.length)];
+                    d3Nodes.push(d3Node);
+                    dbgObjectsToD3Objects.set(o, d3Node);
+                    graphViz.addNodes([d3Node]);
+                    return d3Node;
+                },
+                addEdge: function(e){
+                    var d3Edge = {
+                        source: dbgObjectsToD3Objects.get(e.source) || this.addNode(e.source),
+                        target: dbgObjectsToD3Objects.get(e.target) || this.addNode(e.target)
+                    };
+                    graphViz.addEdges([d3Edge]);
+                    return d3Edge;
+                }
+            });
 
-                links.push({source: n, target: target});
-            }
+            /*
 
-            graphViz.addEdges(links);
+             setInterval( () => {
+
+             var n =
+             graphViz.addNodes([n]);
+
+             var k = randInt1_n(Math.sqrt(graphViz.nodes.length)*2/3);
+             var links = [];
+
+             for(var i = 0 ; i < k ; i++){
+             var target = graphViz.nodes[randInt1_n(graphViz.nodes.length)];
+
+             links.push({source: n, target: target});
+             }
+
+             graphViz.addEdges(links);
 
 
-        }, 500)
+             }, 500)
+
+            */
+
+        })
+
 
     });
 
