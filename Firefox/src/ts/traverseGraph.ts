@@ -25,13 +25,13 @@ Debugger.Resumption = {
 
 
 /*function allKeys(o){
-    console.group()
-    while(o !== null){
-        console.log(Object.getOwnPropertyNames(o))
-        o = P(o)
-    }
-    console.groupEnd()
-}*/
+ console.group()
+ while(o !== null){
+ console.log(Object.getOwnPropertyNames(o))
+ o = P(o)
+ }
+ console.groupEnd()
+ }*/
 
 function frameName(f){
     return f.type === 'call' ?
@@ -42,16 +42,16 @@ function frameName(f){
 
 
 /*function frameEnvIds(frame){
-    var env = frame.environment;
-    var ids = [];
+ var env = frame.environment;
+ var ids = [];
 
-    while(env){
-        ids.push(getObjectId(env));
-        env = env.parent;
-    }
+ while(env){
+ ids.push(getObjectId(env));
+ env = env.parent;
+ }
 
-    console.log('environments of frame', frameName(frame), ':',ids.join(' → '));
-}*/
+ console.log('environments of frame', frameName(frame), ':',ids.join(' → '));
+ }*/
 
 Debugger.Object.prototype.toString = function(){
     var object = this;
@@ -71,10 +71,10 @@ Debugger.Object.prototype.toJSON = Debugger.Object.prototype.toString;
 
 // ACTUAL CODE
 /*
-var win = gBrowser.selectedBrowser.contentWindow;
-var doc = win.document;
-var console = win.console;
-var P = Object.getPrototypeOf;*/
+ var win = gBrowser.selectedBrowser.contentWindow;
+ var doc = win.document;
+ var console = win.console;
+ var P = Object.getPrototypeOf;*/
 
 var dbg = new Debugger();
 dbg.uncaughtExceptionHook = function(e){
@@ -102,19 +102,99 @@ dbg.uncaughtExceptionHook = function(e){
 // };
 // })();
 
+// These have way too much properties and bloat the graph
+var FORBIDDEN_PATHS = [
+    "HTMLDocument.prototype",
+    "Document.prototype",
+    "Element.prototype",
+    "Node.prototype",
+
+    "KeyboardEvent.prototype",
+    "KeyboardEvent",
+    "MouseEvent.prototype",
+    "KeyEvent",
+
+    "Window.prototype",
+    "WindowUtils",
+    "WindowUtils.prototype",
+    "XULTreeBuilder.prototype",
+
+    "SVGSVGElement.prototype",
+
+    "ModalContentWindow.prototype",
+    "mozRTCPeerConnection.prototype",
+    "SVGSVGElement.prototype",
+    "DOMException",
+    "WebGLRenderingContext",
+    "WebGL2RenderingContext",
+
+    "CSSPrimitiveValue",
+    "CSS2Properties.prototype",
+    "SVGElement.prototype",
+    "DOMException.prototype",
+    "WebGLRenderingContext.prototype",
+    "WebGL2RenderingContext.prototype",
+    "CSSPrimitiveValue.prototype",
+    "HTMLElement.prototype",
+    "HTMLObjectElement.prototype",
+
+    "HTMLInputElement.prototype",
+
+    "Navigator.prototype",
+    "HTMLMediaElement.prototype",
+    "TreeContentView.prototype",
+    "Range.prototype",
+    "SVGPathElement.prototype",
+    "HTMLTextAreaElement.prototype",
+
+    "CanvasRenderingContext2D.prototype",
+    "XMLHttpRequest.prototype",
+    "CameraControl.prototype",
 
 
+    "XULElement.prototype",
+    "ChromeWindow.prototype",
+
+    "window",
+
+    "window.String",
+    "Array.prototype",
+    "Date.prototype",
+    "String.prototype",
+
+    "Math",
+
+    "Array",
+    "RegExp"
+];
 
 function traverseGraph(window, graph){
     var globalDebugObject = dbg.addDebuggee(window);
 
+    var FORBIDDEN_OBJS = new Set();
+    FORBIDDEN_OBJS.add(globalDebugObject);
+
+    FORBIDDEN_PATHS.forEach( path => {
+        var pieces = path.split('.');
+
+        var forbiddenObj = pieces.reduce( (acc, current) => {
+            return acc.getOwnPropertyDescriptor(current).value;
+        }, globalDebugObject);
+
+        FORBIDDEN_OBJS.add( forbiddenObj )
+    });
+
+    console.log('Paths:', FORBIDDEN_PATHS.length, 'FORBIDDEN_OBJS', FORBIDDEN_OBJS.size);
+
     // list of Debuggee.Object instances
     var done = new Set();
+    var from = new WeakMap();
     // map of set. from => Set<{to, details}>
     //var edges = new Map();
 
     var todo = new Set();
     todo.add(globalDebugObject);
+    console.log('number of own global props', globalDebugObject.getOwnPropertyNames().length);
 
     while(todo.size !== 0){
 
@@ -126,12 +206,19 @@ function traverseGraph(window, graph){
                 var e = todoIt.next();
                 todo.delete(e);
                 done.add(e);
-                graph.addNode(e);
 
                 // properties
                 var props = e.getOwnPropertyNames();
 
-                //console.log('props', props.join());
+                if(props.length > 25 && !FORBIDDEN_OBJS.has(e)){
+                    console.log(props.length,'props from',
+                        (from.get(from.get(e).obj || {}) || {prop:''}).prop+
+                            '.'+
+                            from.get(e).prop);
+                }
+
+                graph.addNode(e);
+
                 props.forEach( p => {
                     //console.log('p', p)
 
@@ -141,14 +228,17 @@ function traverseGraph(window, graph){
 
                     //console.log('value instanceof Debugger.Object', value instanceof Debugger.Object)
                     if(value instanceof Debugger.Object){
-                        graph.addEdge({source: e, target:value, details:{property: p}});
+                        if(!FORBIDDEN_OBJS.has(e) && !FORBIDDEN_OBJS.has(value))
+                            graph.addEdge({source: e, target:value, details:{property: p}});
 
-                        if(!done.has(value))
+                        if(!done.has(value)){
                             todo.add(value);
+                            from.set(value, {obj: e, prop: p});
+                        }
                     }
                     else{
                         // I guess it's a primitive value
-                        console.assert(value === null || typeof value !== 'object', 'val should not be an object')
+                        //console.assert(value === null || typeof value !== 'object', 'val should not be an object')
                     }
 
                     // accessor

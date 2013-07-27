@@ -36,6 +36,13 @@ import traverseGraph = require('traverseGraph')
 var Cu = chr.Cu;
 
 
+/**
+ * TODO add a node next to one of its neighbour
+ * TODO traverse before any script to list all "irrelevant objects"
+ * traverse after DOMContentLoaded
+ */
+
+
 //console.log('typeof Debugger', typeof Debugger)
 
 var devtools = Cu.import("resource:///modules/devtools/gDevTools.jsm");
@@ -63,7 +70,6 @@ function allKeys(o){
     }
     console.groupEnd()
 }
-
 
 
 var build = (frame, toolbox) => {
@@ -99,24 +105,38 @@ var build = (frame, toolbox) => {
             var dbgObjectsToD3Objects = new WeakMap();
             var d3Nodes = [];
 
+            var i = 0;
+            var WAIT = 25;
+            var MAX_ELEMS = Infinity;
+
             traverseGraph(targetGlobal, {
                 addNode: function(o){
+                    if(i>MAX_ELEMS)
+                        return;
+                    if(dbgObjectsToD3Objects.has(o))
+                        return dbgObjectsToD3Objects.get(o);
+
                     var d3Node = {
                         x: randInt1_n(1000),
-                        y: randInt1_n(400)
+                        y: randInt1_n(600)
                     };
 
                     d3Nodes.push(d3Node);
+                    console.log(d3Nodes.length, 'nodes');
+
                     dbgObjectsToD3Objects.set(o, d3Node);
-                    graphViz.addNodes([d3Node]);
+                    setTimeout( () => { graphViz.addNodes([d3Node]) }, WAIT*i++);
                     return d3Node;
                 },
                 addEdge: function(e){
+
+                    if(i>MAX_ELEMS)
+                        return;
                     var d3Edge = {
                         source: dbgObjectsToD3Objects.get(e.source) || this.addNode(e.source),
                         target: dbgObjectsToD3Objects.get(e.target) || this.addNode(e.target)
                     };
-                    graphViz.addEdges([d3Edge]);
+                    setTimeout( () => { graphViz.addEdges([d3Edge]); }, WAIT*i++);
                     return d3Edge;
                 }
             });
@@ -152,7 +172,9 @@ var build = (frame, toolbox) => {
 
 
     return panel.open();
-}
+};
+
+
 
 
 export function main(){

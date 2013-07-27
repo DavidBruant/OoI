@@ -1,27 +1,31 @@
 declare class Debugger{
     constructor(...args)
-    findScripts() : Array<DebuggerScript>
+    findScripts() : Debugger.Script[]
     uncaughtExceptionHook(e)
-    addDebuggee(global)
+    addDebuggee(global) : Debugger.Object;
 
     static Resumption: any
 
-    static Script()
-    static Object()
 
 }
 
+declare module Debugger{
+    export class Object{
+        toJSON(): string
+        toString(): string
+        getOwnPropertyNames() : string[]
+        getOwnPropertyDescriptor(name: string): PropertyDescriptor
+    }
+    export class Script extends Debugger.Object{
+        url: string
+        source : Debugger.Source
+        getAllOffsets() : ScriptOffsets[]
+        getChildScripts() : Debugger.Script[]
+    }
+    export class Source{
+        text: string
+    }
 
-
-interface DebuggerScript{
-    url: string
-    source : DebuggerScriptSource
-    getAllOffsets() : Array<ScriptOffsets>
-    getChildScripts() : Array<DebuggerScript>
-}
-
-interface DebuggerScriptSource{
-    text: string
 }
 
 interface ScriptOffsets{
