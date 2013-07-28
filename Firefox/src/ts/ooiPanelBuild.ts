@@ -274,7 +274,7 @@ function build(frame, toolbox){
                 return d3Node;
             }
 
-            var MAX = 50;
+            var MAX = 600;
             var i = 0;
             var WAIT = 30;
             var from, to;

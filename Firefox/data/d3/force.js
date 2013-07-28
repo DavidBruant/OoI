@@ -28,25 +28,39 @@
         node.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
 
-        labels.attr("x", function(d) { return (d.source.x + d.target.x) / 2; })
-            .attr("y", function(d) { return (d.source.y + d.target.y) / 2; })
+        //labels.attr("x", function(d) { return (d.source.x + d.target.x) / 2; })
+        //    .attr("y", function(d) { return (d.source.y + d.target.y) / 2; })
 
     }
 
     function restart() {
 
         link = link.data(links);
+        // directed graph http://bl.ocks.org/rkirsling/5001347
 
         link.enter().insert("line", ".node")
-            .attr("class", "link");
+            .attr("class", "link")
+            .attr("stroke-width", 3)
+            .attr('title', e => e.label)
+            .on('mouseover', e => {
+                svg.append('text')
+                    .attr('class', 'label')
+                    .attr("x", function() { return (e.source.x + e.target.x) / 2; })
+                    .attr("y", function() { return (e.source.y + e.target.y) / 2; })
+                    .attr("text-anchor", "middle")
+                    .text(e.label);
+            })
+            .on('mouseleave', e => {
+                svg.selectAll("text.label").remove();
+            });
 
-        labels = labels.data(links);
+        /*labels = labels.data(links);
 
         labels.enter().append('text')
             .attr("x", function(d) { return (d.source.y + d.target.y) / 2; })
             .attr("y", function(d) { return (d.source.x + d.target.x) / 2; })
             .attr("text-anchor", "middle")
-            .text(e => e.label);
+            .text(e => e.label);*/
 
         node = node.data(nodes);
 
@@ -70,7 +84,7 @@
 
     node = svg.selectAll(".node");
     link = svg.selectAll(".link");
-    labels = svg.selectAll('text');
+    //labels = svg.selectAll('text');
 
     restart();
     //});
