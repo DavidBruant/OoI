@@ -11,7 +11,10 @@ interface GraphEdge<N> extends GraphEdgeInternal<N>{
     to: N;
 }
 
-interface GraphNodeSet<N extends GraphNodeInternal> extends SetI<N>{}
+interface GraphNodeSet<N extends GraphNodeInternal> extends SetI<N>{
+    add(n: N) : void
+
+}
 interface GraphEdgeSet<E extends GraphEdgeInternal<GraphNodeInternal>> extends SetI<E>{}
 
 interface Graph<N extends GraphNodeInternal, E extends GraphEdgeInternal<N>>{

@@ -17,6 +17,7 @@
         links = force.links();
     var node,
         link;
+    var labels;
 
     function tick() {
         link.attr("x1", function(d) { return d.source.x; })
@@ -26,6 +27,10 @@
 
         node.attr("cx", function(d) { return d.x; })
             .attr("cy", function(d) { return d.y; });
+
+        labels.attr("x", function(d) { return (d.source.x + d.target.x) / 2; })
+            .attr("y", function(d) { return (d.source.y + d.target.y) / 2; })
+
     }
 
     function restart() {
@@ -35,10 +40,18 @@
         link.enter().insert("line", ".node")
             .attr("class", "link");
 
+        labels = labels.data(links);
+
+        labels.enter().append('text')
+            .attr("x", function(d) { return (d.source.y + d.target.y) / 2; })
+            .attr("y", function(d) { return (d.source.x + d.target.x) / 2; })
+            .attr("text-anchor", "middle")
+            .text(e => e.label);
+
         node = node.data(nodes);
 
         node.enter().insert("circle", ".cursor")
-            .attr("class", "node")
+            .attr("class", n => n.class? "node "+ n.class : "node")
             .attr("r", 5)
             .call(force.drag);
 
@@ -47,18 +60,19 @@
 
     //document.addEventListener('DOMContentLoaded', e => {
 
-        var svg = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height", height);
+    var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
 
-        svg.append("rect")
-            .attr("width", width)
-            .attr("height", height);
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height);
 
-        node = svg.selectAll(".node");
-        link = svg.selectAll(".link");
+    node = svg.selectAll(".node");
+    link = svg.selectAll(".link");
+    labels = svg.selectAll('text');
 
-        restart();
+    restart();
     //});
 
     console.log('typeof global from force',typeof global);

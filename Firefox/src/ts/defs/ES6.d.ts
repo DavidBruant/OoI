@@ -8,18 +8,18 @@ declare class Map<K, V>{
 }
 
 // ES6 sets
-declare class Set<V> implements SetI{
+declare class Set<V> implements SetI<V>{
     add(v: V)
-    has(v: V)
+    has(v: V) : boolean
     delete(v: V)
     values() : Iterator<V>
     size : number // TODO change to a getter when https://typescript.codeplex.com/workitem/260 is fixed
 }
 
 interface SetI<V>{
-    add(v: V)
-    has?(v: V)
-    delete?(v: V)
+    add(v: V) : void
+    has?(v: V) : boolean
+    delete?(v: V) : void
     values?() : Iterator<V>
     size? : number // TODO change to a getter when https://typescript.codeplex.com/workitem/260 is fixed
 }

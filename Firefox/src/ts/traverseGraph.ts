@@ -1,57 +1,11 @@
 "use strict";
 
-// LIBRARY
-
 import chrome = require("chrome");
 var Cu = chrome.Cu
 
 var addDebuggerToGlobal = Cu.import("resource://gre/modules/jsdebugger.jsm").addDebuggerToGlobal;
 addDebuggerToGlobal(this); // Ignore TypeScript compiler warning for here
 
-// Safer and more declarative replacement for resumption value
-Debugger.Resumption = {
-    return : function(value){
-        return {return: value};
-    },
-    yield : function(value){
-        return {yield: value};
-    },
-    throw : function(value){
-        return {throw: value};
-    },
-    stop : null,
-    continue : undefined
-};
-
-
-/*function allKeys(o){
- console.group()
- while(o !== null){
- console.log(Object.getOwnPropertyNames(o))
- o = P(o)
- }
- console.groupEnd()
- }*/
-
-function frameName(f){
-    return f.type === 'call' ?
-        f.callee.name :
-        f.type ;
-}
-
-
-
-/*function frameEnvIds(frame){
- var env = frame.environment;
- var ids = [];
-
- while(env){
- ids.push(getObjectId(env));
- env = env.parent;
- }
-
- console.log('environments of frame', frameName(frame), ':',ids.join(' → '));
- }*/
 
 Debugger.Object.prototype.toString = function(){
     var object = this;
@@ -68,105 +22,11 @@ Debugger.Object.prototype.toString = function(){
 Debugger.Object.prototype.toJSON = Debugger.Object.prototype.toString;
 
 
-
-// ACTUAL CODE
-/*
- var win = gBrowser.selectedBrowser.contentWindow;
- var doc = win.document;
- var console = win.console;
- var P = Object.getPrototypeOf;*/
-
 var dbg = new Debugger();
 dbg.uncaughtExceptionHook = function(e){
     console.error('uncaughtExceptionHook', e, e.stack);
 };
 
-
-
-
-
-
-
-
-// var getObjectId = (function(){
-// var wm = new WeakMap();
-// var id = 1;
-//
-// return function (frame){
-// if(wm.has(frame))
-// return wm.get(frame);
-// else{
-// wm.set(frame, id);
-// return id++;
-// }
-// };
-// })();
-
-// These have way too much properties and bloat the graph
-var FORBIDDEN_PATHS = [
-    "HTMLDocument.prototype",
-    "Document.prototype",
-    "Element.prototype",
-    "Node.prototype",
-
-    "KeyboardEvent.prototype",
-    "KeyboardEvent",
-    "MouseEvent.prototype",
-    "KeyEvent",
-
-    "Window.prototype",
-    "WindowUtils",
-    "WindowUtils.prototype",
-    "XULTreeBuilder.prototype",
-
-    "SVGSVGElement.prototype",
-
-    "ModalContentWindow.prototype",
-    "mozRTCPeerConnection.prototype",
-    "SVGSVGElement.prototype",
-    "DOMException",
-    "WebGLRenderingContext",
-    "WebGL2RenderingContext",
-
-    "CSSPrimitiveValue",
-    "CSS2Properties.prototype",
-    "SVGElement.prototype",
-    "DOMException.prototype",
-    "WebGLRenderingContext.prototype",
-    "WebGL2RenderingContext.prototype",
-    "CSSPrimitiveValue.prototype",
-    "HTMLElement.prototype",
-    "HTMLObjectElement.prototype",
-
-    "HTMLInputElement.prototype",
-
-    "Navigator.prototype",
-    "HTMLMediaElement.prototype",
-    "TreeContentView.prototype",
-    "Range.prototype",
-    "SVGPathElement.prototype",
-    "HTMLTextAreaElement.prototype",
-
-    "CanvasRenderingContext2D.prototype",
-    "XMLHttpRequest.prototype",
-    "CameraControl.prototype",
-
-
-    "XULElement.prototype",
-    "ChromeWindow.prototype",
-
-    "window",
-
-    "window.String",
-    "Array.prototype",
-    "Date.prototype",
-    "String.prototype",
-
-    "Math",
-
-    "Array",
-    "RegExp"
-];
 
 /*
  Travsersing has to be a synchronous operation, otherwise the graph may change between turns.
@@ -175,32 +35,16 @@ var FORBIDDEN_PATHS = [
 function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
     var globalDebugObject = dbg.addDebuggee(window);
 
-    /*var FORBIDDEN_OBJS = new Set();
-    FORBIDDEN_OBJS.add(globalDebugObject);
+    globalDebugObject.root = true;
 
-    FORBIDDEN_PATHS.forEach( path => {
-        var pieces = path.split('.');
-
-        var forbiddenObj = pieces.reduce( (acc, current) => {
-            return acc.getOwnPropertyDescriptor(current).value;
-        }, globalDebugObject);
-
-        FORBIDDEN_OBJS.add( forbiddenObj )
-    });
-
-    console.log('Paths:', FORBIDDEN_PATHS.length, 'FORBIDDEN_OBJS', FORBIDDEN_OBJS.size);*/
-
-    // list of Debuggee.Object instances
     var done = new Set();
-    //var from = new WeakMap();
-    // map of set. from => Set<{to, details}>
-    //var edges = new Map();
 
     var todo = new Set();
     todo.add(globalDebugObject);
+
     console.log('number of own global props', globalDebugObject.getOwnPropertyNames().length);
 
-    while(todo.size !== 0){
+    while(todo.size !== 0){ // TODO for..of
 
         var todoIt = todo.values();
 
@@ -214,45 +58,51 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                 // properties
                 var props = e.getOwnPropertyNames();
 
-                /*if(props.length > 25 && !FORBIDDEN_OBJS.has(e)){
-                    console.log(props.length,'props from',
-                        (from.get(from.get(e).obj || {}) || {prop:''}).prop+
-                            '.'+
-                            from.get(e).prop);
-                }*/
-
                 graph.nodes.add(e);
 
-                props.forEach( p => {
-                    //console.log('p', p)
+                props.forEach( p => { // TODO for..of
+
+                    var desc = e.getOwnPropertyDescriptor(p);
 
                     // data property
-                    var desc = e.getOwnPropertyDescriptor(p);
                     var value = desc.value;
 
-                    //console.log('value instanceof Debugger.Object', value instanceof Debugger.Object)
                     if(value instanceof Debugger.Object){
-                        //if(!FORBIDDEN_OBJS.has(e) && !FORBIDDEN_OBJS.has(value))
-                            graph.edges.add({from: e, to:value, details:{property: p}});
+                        graph.edges.add({from: e, to:value, details:{dataProperty: p}});
 
                         if(!done.has(value)){
                             todo.add(value);
-                            //from.set(value, {obj: e, prop: p});
                         }
                     }
                     else{
-                        // I guess it's a primitive value
+                        // value is a primitive value
                         //console.error(value === null || typeof value !== 'object', 'val should not be an object')
                     }
 
                     // accessor
+                    var get = desc.get;
+                    if(get instanceof Debugger.Object){
+                        graph.edges.add({from: e, to:get, details:{getter: p}});
 
-                    // [[Prototype]]
+                        if(!done.has(get)){
+                            todo.add(get);
+                        }
+                    }
+                    var set = desc.set;
+                    if(set instanceof Debugger.Object){
+                        graph.edges.add({from: e, to:set, details:{setter: p}});
 
-                    // [[WeakMapData]] [[MapData]] [[SetData]]
+                        if(!done.has(set)){
+                            todo.add(set);
+                        }
+                    }
+                });
 
-                    // lexical scope for a function
-                })
+                // [[Prototype]]
+
+                // [[WeakMapData]] [[MapData]] [[SetData]]
+
+                // lexical scope for a function
 
             }
             catch(e){
@@ -268,34 +118,4 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
 
 }
 
-
 export = traverseGraph;
-
-
-//drawGraph( traverse( globalDebugObject.getOwnPropertyDescriptor('Object').value ) )
-
-
-
-// Save init values of all variables in this frame
-// onEnterFrame = function (frame) {
-// if (frame.type === "call") {
-
-/*
- var bps = 0
- console.time('bp');
- scripts.forEach(function(s){
- // console.log(s.url);
- var lineOffsets = s.getAllOffsets();
-
- lineOffsets.forEach(function(o, line){
- if(Array.isArray(o)){
- o.forEach(function(offset){
- s.setBreakpoint(offset, bpHandler);
- bps++;
- });
- }
- });
- });
- console.timeEnd('bp');
- console.log('breakpoints', bps);
- */

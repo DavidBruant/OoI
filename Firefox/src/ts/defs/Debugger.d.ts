@@ -15,12 +15,17 @@ declare module Debugger{
         toString(): string
         getOwnPropertyNames() : string[]
         getOwnPropertyDescriptor(name: string): PropertyDescriptor
+
+        // custom
+        root : boolean
     }
+
     export class Script extends Debugger.Object{
         url: string
         source : Debugger.Source
         getAllOffsets() : ScriptOffsets[]
         getChildScripts() : Debugger.Script[]
+
     }
     export class Source{
         text: string
