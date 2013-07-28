@@ -168,10 +168,14 @@ var FORBIDDEN_PATHS = [
     "RegExp"
 ];
 
-function traverseGraph(window, graph){
+/*
+ Travsersing has to be a synchronous operation, otherwise the graph may change between turns.
+*/
+
+function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
     var globalDebugObject = dbg.addDebuggee(window);
 
-    var FORBIDDEN_OBJS = new Set();
+    /*var FORBIDDEN_OBJS = new Set();
     FORBIDDEN_OBJS.add(globalDebugObject);
 
     FORBIDDEN_PATHS.forEach( path => {
@@ -184,11 +188,11 @@ function traverseGraph(window, graph){
         FORBIDDEN_OBJS.add( forbiddenObj )
     });
 
-    console.log('Paths:', FORBIDDEN_PATHS.length, 'FORBIDDEN_OBJS', FORBIDDEN_OBJS.size);
+    console.log('Paths:', FORBIDDEN_PATHS.length, 'FORBIDDEN_OBJS', FORBIDDEN_OBJS.size);*/
 
     // list of Debuggee.Object instances
     var done = new Set();
-    var from = new WeakMap();
+    //var from = new WeakMap();
     // map of set. from => Set<{to, details}>
     //var edges = new Map();
 
@@ -210,14 +214,14 @@ function traverseGraph(window, graph){
                 // properties
                 var props = e.getOwnPropertyNames();
 
-                if(props.length > 25 && !FORBIDDEN_OBJS.has(e)){
+                /*if(props.length > 25 && !FORBIDDEN_OBJS.has(e)){
                     console.log(props.length,'props from',
                         (from.get(from.get(e).obj || {}) || {prop:''}).prop+
                             '.'+
                             from.get(e).prop);
-                }
+                }*/
 
-                graph.addNode(e);
+                graph.nodes.add(e);
 
                 props.forEach( p => {
                     //console.log('p', p)
@@ -228,17 +232,17 @@ function traverseGraph(window, graph){
 
                     //console.log('value instanceof Debugger.Object', value instanceof Debugger.Object)
                     if(value instanceof Debugger.Object){
-                        if(!FORBIDDEN_OBJS.has(e) && !FORBIDDEN_OBJS.has(value))
-                            graph.addEdge({source: e, target:value, details:{property: p}});
+                        //if(!FORBIDDEN_OBJS.has(e) && !FORBIDDEN_OBJS.has(value))
+                            graph.edges.add({from: e, to:value, details:{property: p}});
 
                         if(!done.has(value)){
                             todo.add(value);
-                            from.set(value, {obj: e, prop: p});
+                            //from.set(value, {obj: e, prop: p});
                         }
                     }
                     else{
                         // I guess it's a primitive value
-                        //console.assert(value === null || typeof value !== 'object', 'val should not be an object')
+                        //console.error(value === null || typeof value !== 'object', 'val should not be an object')
                     }
 
                     // accessor

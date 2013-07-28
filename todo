@@ -1,4 +1,12 @@
-# Knowing where an object is from in source:
+# Drawing a graph without built-ins
+
+* Addon is common to all tabs
+* Traverse graph before any script runs (only built-ins)
+
+
+
+
+# Knowing where an object is from in source
 
 * Analyze source code to see where they are created
 * Set breakpoints are these places and know where to find the new Debugger.Object

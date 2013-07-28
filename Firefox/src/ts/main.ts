@@ -1,212 +1,69 @@
 /// <reference path="./defs/Debugger.d.ts" />
+/// <reference path="./defs/jetpack-timers.d.ts" />
+/// <reference path="./defs/jetpack-self.d.ts" />
+/// <reference path="./defs/jetpack-system-events.d.ts" />
 
 "use strict";
 
-import timers = require('timers');
-import tabs = require('tabs');
+
 import self = require("self");
+var data = self.data;
 
-var setTimeout = timers.setTimeout;
-var setInterval = timers.setInterval;
-var clearTimeout = timers.clearTimeout;
-var clearInterval = timers.clearInterval;
-
-// For whatever reason, there is no console available in this addon (wtf!)
-/*var console = {
-    log: function (...args){
-        var argsStr = args.map((a)=>String(a)).join(' ');
-        setTimeout( () => {throw new Error(argsStr)} , 10);
-    }
-};*/
-
-import getObjectCreationsLocations = require('getObjectCreationsLocations');
-import evalWithContext = require('evalWithContext');
-
-import getSDKTabContentWindow = require('getSDKTabContentWindow');
-import sdkTabToXulTab = require('sdkTabToXulTab');
-import utils = require("tabs/utils");
-var getXULTabContentWindow = utils.getTabContentWindow;
-
-import devToolsOpen = require('devToolsOpen');
-import OoIPanel = require('OoIPanel');
 import chr = require("chrome");
-
-import traverseGraph = require('traverseGraph')
-
 var Cu = chr.Cu;
 
 
-/**
- * TODO add a node next to one of its neighbour
- * TODO traverse before any script to list all "irrelevant objects"
- * traverse after DOMContentLoaded
+import getObjectCreationsLocations = require('getObjectCreationsLocations');
+
+
+import ooiPanelBuild = require('ooiPanelBuild')
+
+
+
+// For whatever reason, there is no console available in this addon (wtf!)
+/*var console = {
+ log: function (...args){
+ var argsStr = args.map((a)=>String(a)).join(' ');
+ setTimeout( () => {throw new Error(argsStr)} , 10);
+ }
+ };*/
+
+/*
+  TODO traverse before any script to list all "irrelevant objects"
+  TODO traverse after DOMContentLoaded
+  TODO add a node next to one of its neighbour
  */
 
 
 //console.log('typeof Debugger', typeof Debugger)
 
 var devtools = Cu.import("resource:///modules/devtools/gDevTools.jsm");
-
 var gDevTools = devtools.gDevTools;
-
-
-var data = self.data;
-
-var d3Source = data.load('d3/d3.v3.js');
-var forceSource = data.load('d3/force.js');
-
-
-
-function randInt1_n(max){
-    return Math.floor(Math.random()*max);
-}
-
-var P = Object.getPrototypeOf;
-function allKeys(o){
-    console.group()
-    while(o !== null){
-        console.log(Object.getOwnPropertyNames(o))
-        o = P(o)
-    }
-    console.groupEnd()
-}
-
-
-var build = (frame, toolbox) => {
-    var panel = new OoIPanel(frame, toolbox);
-    var tab = toolbox.target.tab;
-    var targetGlobal = getXULTabContentWindow(tab);
-
-
-    function fakeRequestAnimationFrame(callback){ // what it takes to get it working -_-#
-        frame.requestAnimationFrame(callback)
-    }
-
-    frame.document.addEventListener('DOMContentLoaded', e => {
-        var overrides = <any> {
-            setTimeout: setTimeout,
-            clearTimeout: clearTimeout,
-            requestAnimationFrame: fakeRequestAnimationFrame
-        };
-        overrides.global = overrides;
-
-        evalWithContext(d3Source, frame, overrides);
-        evalWithContext(forceSource, frame, overrides);
-
-        var graphViz = overrides.graphViz;
-
-        frame.document.querySelector('button').addEventListener('click', e => {
-            var button = e.target;
-            // cleanup
-            //frame.document.body.textContent = '';
-            // put the button back in
-            //frame.document.appendChild(button);
-
-            var dbgObjectsToD3Objects = new WeakMap();
-            var d3Nodes = [];
-
-            var i = 0;
-            var WAIT = 25;
-            var MAX_ELEMS = Infinity;
-
-            traverseGraph(targetGlobal, {
-                addNode: function(o){
-                    if(i>MAX_ELEMS)
-                        return;
-                    if(dbgObjectsToD3Objects.has(o))
-                        return dbgObjectsToD3Objects.get(o);
-
-                    var d3Node = {
-                        x: randInt1_n(1000),
-                        y: randInt1_n(600)
-                    };
-
-                    d3Nodes.push(d3Node);
-                    console.log(d3Nodes.length, 'nodes');
-
-                    dbgObjectsToD3Objects.set(o, d3Node);
-                    setTimeout( () => { graphViz.addNodes([d3Node]) }, WAIT*i++);
-                    return d3Node;
-                },
-                addEdge: function(e){
-
-                    if(i>MAX_ELEMS)
-                        return;
-                    var d3Edge = {
-                        source: dbgObjectsToD3Objects.get(e.source) || this.addNode(e.source),
-                        target: dbgObjectsToD3Objects.get(e.target) || this.addNode(e.target)
-                    };
-                    setTimeout( () => { graphViz.addEdges([d3Edge]); }, WAIT*i++);
-                    return d3Edge;
-                }
-            });
-
-            /*
-
-             setInterval( () => {
-
-             var n =
-             graphViz.addNodes([n]);
-
-             var k = randInt1_n(Math.sqrt(graphViz.nodes.length)*2/3);
-             var links = [];
-
-             for(var i = 0 ; i < k ; i++){
-             var target = graphViz.nodes[randInt1_n(graphViz.nodes.length)];
-
-             links.push({source: n, target: target});
-             }
-
-             graphViz.addEdges(links);
-
-
-             }, 500)
-
-            */
-
-        })
-
-
-    });
-
-
-
-    return panel.open();
-};
-
-
 
 
 export function main(){
 
-    console.log('before registerTool')
-    gDevTools.registerTool({
+    // TODO figure out if there is a way to unregister a tool
+    gDevTools.registerTool( {
         id: 'OoI',
         icon: "chrome://browser/skin/devtools/tool-inspector.png",
         // https://github.com/mozilla/mozilla-central/blob/1886faa9e2f7ccede29d0f5696a423997322978b/browser/devtools/framework/toolbox.js#L473
         url: data.url("OoIpanel.html"),
         label: "Object of Interest",
         isTargetSupported: function(target){
-            return true;
+            return true; // TODO figure out what's up here
         },
-        build: build
-
+        build: ooiPanelBuild
     });
 
-    // figure out if there is a way to unregister a tool
-    console.log('after registerTool');
+
+
+
+
+
+
 
     /*
-     Need to create a webpage with d3 in it.
-
-     Create a first graph based on before-any-script objects.
-
-     Add a simple API to add a node and a link to the graph, as well as remove a node and a link
-
-
-
-
-
 
     tabs.on('ready', function(tab) {
 
@@ -249,9 +106,3 @@ export function main(){
 
     console.log('OoI addon loaded without error');
 }
-
-
-// drawGraph( traverse( globalDebugObject ) )
-
-//declare var module;
-//module.exports.main = main

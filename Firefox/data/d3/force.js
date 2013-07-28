@@ -1,8 +1,8 @@
 ( () => {
     "use strict";
 
-    var width = 1000,
-        height = 600;
+    var width = 1300,
+        height = 700;
 
     var fill = d3.scale.category20();
 

@@ -1,3 +1,6 @@
+/// <reference path="./jetpack-event-core.d.ts" />
+/// <reference path="./jetpack-tabs-utils.d.ts" />
+
 // https://github.com/mozilla/mozilla-central/blob/master/browser/devtools/framework/gDevTools.jsm
 interface devtoolsExportObject{
     // https://github.com/mozilla/mozilla-central/blob/master/toolkit/devtools/Loader.jsm

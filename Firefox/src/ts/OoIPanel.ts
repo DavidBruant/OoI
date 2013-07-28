@@ -1,4 +1,6 @@
-// <reference path="./defs/devtoolsDefs.ts" />
+/// <reference path="./defs/devtoolsDefs.d.ts" />
+/// <reference path="./defs/jetpack-promise.d.ts" />
+/// <reference path="./defs/jetpack-chrome.d.ts" />
 
 import jetpackPromise = require('sdk/core/promise');
 import chrome = require('chrome')

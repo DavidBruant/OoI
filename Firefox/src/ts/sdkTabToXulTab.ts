@@ -1,3 +1,5 @@
+/// <reference path="./defs/jetpack-tabs.d.ts" />
+
 "use strict";
 
 import tabsUtils = require('tabs/utils');

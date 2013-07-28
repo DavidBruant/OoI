@@ -2,12 +2,12 @@ declare class Debugger{
     constructor(...args)
     findScripts() : Debugger.Script[]
     uncaughtExceptionHook(e)
-    addDebuggee(global) : Debugger.Object;
+    addDebuggee(global : Global) : Debugger.Object;
 
     static Resumption: any
-
-
 }
+
+interface Global{}
 
 declare module Debugger{
     export class Object{
