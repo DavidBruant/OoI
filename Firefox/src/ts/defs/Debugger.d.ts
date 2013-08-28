@@ -2,7 +2,7 @@ declare class Debugger{
     constructor(...args)
     findScripts() : Debugger.Script[]
     uncaughtExceptionHook(e)
-    addDebuggee(global : Global) : Debugger.Object;
+    addDebuggee(global : Global) : Debugger.Object; // returns a Debuggee value for the inner window (Window and not WindowProxy)
 
     static Resumption: any
 }

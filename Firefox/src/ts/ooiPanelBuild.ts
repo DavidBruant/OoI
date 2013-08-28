@@ -32,7 +32,8 @@ import events = require("sdk/system/events");
 
 
 var d3Source = data.load('d3/d3.v3.js');
-var forceSource = data.load('d3/force.js');
+var BSPSource = data.load('src/2DBSP.js');
+var forceSource = data.load('src/force.js');
 
 
 /*
@@ -103,6 +104,7 @@ function build(frame, toolbox){
 
         // load d3, force and get the graphViz API back
         evalWithContext(d3Source, frame, overrides);
+        evalWithContext(BSPSource, frame, overrides);
         evalWithContext(forceSource, frame, overrides);
 
         var graphViz = overrides.graphViz;
@@ -154,15 +156,15 @@ function build(frame, toolbox){
 
 
 
-            console.time('clickGraph');
+            //console.time('clickGraph');
             var clickGraph = new SimpleGraph();
             traverseGraph(targetGlobal, clickGraph);
-            console.timeEnd('clickGraph');
+            //console.timeEnd('clickGraph');
             console.log('click graph', clickGraph.nodes.size, clickGraph.edges.size);
 
 
 
-            console.time('differenceGraph');
+            //console.time('differenceGraph');
             var relatedPreScriptGraph = globalToPreScriptGraph.get(targetGlobal);
 
             var differenceGraph = new SimpleGraph();
@@ -198,12 +200,12 @@ function build(frame, toolbox){
                         console.error('edge iteration error', e)
                 }
             }
-            console.timeEnd('differenceGraph');
+            //console.timeEnd('differenceGraph');
 
             console.log('differenceGraph', differenceGraph.nodes.size, differenceGraph.edges.size);
 
             // draw the differenceGraph
-            console.time('draw difference graph');
+            //console.time('draw difference graph');
             var RANDOM_RANGE = 250;
             var diffGraphEdgeIt = differenceGraph.edges.values();
             var e;
@@ -274,7 +276,7 @@ function build(frame, toolbox){
                 return d3Node;
             }
 
-            var MAX = 600;
+            var MAX = 400;
             var i = 0;
             var WAIT = 30;
             var from, to;
@@ -315,7 +317,7 @@ function build(frame, toolbox){
                     console.log(i, 'edges');
             }
 
-            console.timeEnd('draw difference graph');
+            //console.timeEnd('draw difference graph');
 
 
 

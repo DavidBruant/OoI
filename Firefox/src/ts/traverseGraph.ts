@@ -42,6 +42,8 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
     var todo = new Set();
     todo.add(globalDebugObject);
 
+    // TODO add global.window to done to pretend it's been traversed already ("WindowProxy of the Window")
+
     console.log('number of own global props', globalDebugObject.getOwnPropertyNames().length);
 
     while(todo.size !== 0){ // TODO for..of

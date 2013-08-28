@@ -34,6 +34,7 @@ interface MenuEntry{
 }
 
 interface DevTools{
+
     _toolboxes : Map<DevToolsTarget, DevToolsToolbox>
     registerTool(dtd: DevToolDescription):void
 }
