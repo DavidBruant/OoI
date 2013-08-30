@@ -78,12 +78,14 @@
         .attr("width", width)
         .attr("height", height);
 
-    svg.append("rect")
+    // group nodes and links
+    var g = svg.append("g")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .attr('id', 'viewport');
 
-    node = svg.selectAll(".node");
-    link = svg.selectAll(".link");
+    node = g.selectAll(".node");
+    link = g.selectAll(".link");
     //labels = svg.selectAll('text');
 
     restart();
@@ -166,13 +168,13 @@
     var linkToLabel = new WeakMap();
 
     function displayCloseLabels(e){
-        var svgEl = svg[0][0];
-        var svgCoords = svgEl.getBoundingClientRect();
 
-        var mouseSvgX = e.clientX - svgCoords.left,
-            mouseSvgY = e.clientY - svgCoords.top;
+        //console.log('svgCoords', svgCoords)
 
-        //console.log('mouse coords relative to SVG', mouseSvgX, mouseSvgY);
+        var mouseSvgX = e.clientX + document.defaultView.pageXOffset; // need to shift of the rectangle of the svg document (because of "graph!" button) and add that
+        var mouseSvgY = e.clientY + document.defaultView.pageYOffset;
+
+        console.log('mouse coords relative to SVG', mouseSvgX, mouseSvgY);
 
         var objs = getCloseRelevantObjects(mouseSvgX, mouseSvgY);
         // sort them by closeness
@@ -181,7 +183,7 @@
         objs.forEach(function(o){
 
             if(!linkToLabel.get(o.linkObj)){
-                var text = svg.append('text')
+                var text = g.append('text')
                     .attr('class', 'label')
                     .attr("x", o.x)
                     .attr("y", o.y)
@@ -202,6 +204,23 @@
         })
 
     }
+
+    var previousAlpha = 0;
+
+    function playPauseToggle(){
+        var alpha = force.alpha();
+
+        if(alpha){
+            force.stop();
+            previousAlpha = alpha;
+        }
+        else{
+            force.alpha(previousAlpha);
+        }
+    }
+
+    document.body.addEventListener('click', playPauseToggle);
+
 
     force.on('end', function(){
 

@@ -34,6 +34,7 @@ import events = require("sdk/system/events");
 var d3Source = data.load('d3/d3.v3.js');
 var BSPSource = data.load('src/2DBSP.js');
 var forceSource = data.load('src/force.js');
+var svgpanSource = data.load('src/svgpan.js');
 
 
 /*
@@ -106,6 +107,7 @@ function build(frame, toolbox){
         evalWithContext(d3Source, frame, overrides);
         evalWithContext(BSPSource, frame, overrides);
         evalWithContext(forceSource, frame, overrides);
+        evalWithContext(svgpanSource, frame, overrides);
 
         var graphViz = overrides.graphViz;
 
@@ -276,7 +278,7 @@ function build(frame, toolbox){
                 return d3Node;
             }
 
-            var MAX = 400;
+            var MAX = 300;
             var i = 0;
             var WAIT = 30;
             var from, to;
