@@ -1,7 +1,7 @@
 "use strict";
 
 import chrome = require("chrome");
-var Cu = chrome.Cu
+var Cu = chrome.Cu;
 
 var addDebuggerToGlobal = Cu.import("resource://gre/modules/jsdebugger.jsm").addDebuggerToGlobal;
 addDebuggerToGlobal(this); // Ignore TypeScript compiler warning for here
@@ -29,20 +29,23 @@ dbg.uncaughtExceptionHook = function(e){
 
 
 /*
- Travsersing has to be a synchronous operation, otherwise the graph may change between turns.
+ Traversing has to be a synchronous operation, otherwise the graph may change between turns.
 */
-
 function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
     var globalDebugObject = dbg.addDebuggee(window);
 
-    globalDebugObject.root = true;
-
     var done = new Set();
-
     var todo = new Set();
-    todo.add(globalDebugObject);
 
-    // TODO add global.window to done to pretend it's been traversed already ("WindowProxy of the Window")
+    // bootstrap traversal
+
+    // globalDebugObject represents the Window instance, while globalDebugObject.window represents the WindowProxy (see HTML5 spec for difference)
+    // This results in two "twin global objects" being present for the global object.
+    //
+    var windowProxyDebuggeeObject = globalDebugObject.getOwnPropertyDescriptor('window').value;
+    windowProxyDebuggeeObject.root = true;
+
+    todo.add(windowProxyDebuggeeObject);
 
     console.log('number of own global props', globalDebugObject.getOwnPropertyNames().length);
 

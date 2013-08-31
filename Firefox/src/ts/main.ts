@@ -12,12 +12,9 @@ var data = self.data;
 import chr = require("chrome");
 var Cu = chr.Cu;
 
-
 import getObjectCreationsLocations = require('getObjectCreationsLocations');
 
-
 import ooiPanelBuild = require('ooiPanelBuild')
-
 
 
 // For whatever reason, there is no console available in this addon (wtf!)
@@ -28,11 +25,7 @@ import ooiPanelBuild = require('ooiPanelBuild')
  }
  };*/
 
-/*
-  TODO traverse before any script to list all "irrelevant objects"
-  TODO traverse after DOMContentLoaded
-  TODO add a node next to one of its neighbour
- */
+// TODO automatically graph on DOMContentLoaded
 
 
 //console.log('typeof Debugger', typeof Debugger)
