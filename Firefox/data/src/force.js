@@ -78,6 +78,15 @@
         .attr("width", width)
         .attr("height", height);
 
+    // this rect allows to know the right getClientBoundingRect. the <svg> doesn't. TODO Figure out why
+    // also, find out why there is no viewport property on the SVGSVGElement
+    svg.append("rect")
+        .attr("width", width)
+        .attr("height", height)
+        .attr('stroke', 'black')
+        .attr('stroke-width', '1')
+        .attr('id', 'viewportRect');
+
     // group nodes and links
     var g = svg.append("g")
         .attr("width", width)
@@ -168,13 +177,23 @@
     var linkToLabel = new WeakMap();
 
     function displayCloseLabels(e){
+        var rect = svg[0][0].querySelector('rect').getBoundingClientRect();
 
-        //console.log('svgCoords', svgCoords)
+        var mouseSvgX = e.pageX - rect.left - document.defaultView.pageXOffset;
+        var mouseSvgY = e.pageY - rect.top - document.defaultView.pageYOffset;
 
-        var mouseSvgX = e.clientX + document.defaultView.pageXOffset; // need to shift of the rectangle of the svg document (because of "graph!" button) and add that
-        var mouseSvgY = e.clientY + document.defaultView.pageYOffset;
+        /*
+        Graphical debugging
 
-        console.log('mouse coords relative to SVG', mouseSvgX, mouseSvgY);
+        var dot = g.append('circle')
+            .attr("cx", mouseSvgX)
+            .attr("cy", mouseSvgY)
+            .attr("r", 2)
+            .attr('fill', 'purple');
+
+        setTimeout(function(){
+            dot.remove();
+        }, 3000);*/
 
         var objs = getCloseRelevantObjects(mouseSvgX, mouseSvgY);
         // sort them by closeness
