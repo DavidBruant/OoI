@@ -15,9 +15,11 @@ declare module Debugger{
         toString(): string
         getOwnPropertyNames() : string[]
         getOwnPropertyDescriptor(name: string): PropertyDescriptor
+        proto: Debugger.Object
 
         // custom
         root : boolean
+        byPath(path: string) : Debugger.Object
     }
 
     export class Script extends Debugger.Object{

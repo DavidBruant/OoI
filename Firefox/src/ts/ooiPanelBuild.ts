@@ -292,28 +292,31 @@ function build(frame, toolbox){
                         break;
                 }
 
-                setTimeout( ( e => {
-                    var label;
-                    var details = e.details;
+                if(!e.details.defaultPrototype){
+                    setTimeout( ( e => {
+                        var label;
+                        var details = e.details;
 
-                    if(details.dataProperty){
-                        label = details.dataProperty
-                    }
-                    if(details.getter){
-                        label = '[[Getter]] '+details.getter
-                    }
-                    if(details.setter){
-                        label = '[[Setter]] '+details.setter
-                    }
+                        if(details.dataProperty){
+                            label = details.dataProperty
+                        }
+                        if(details.getter){
+                            label = '[[Getter]] '+details.getter
+                        }
+                        if(details.setter){
+                            label = '[[Setter]] '+details.setter
+                        }
 
-                    var d3Edge = {
-                        source: dbgObjectsToD3Objects.get(e.from) || getD3Node(e.from),
-                        target: dbgObjectsToD3Objects.get(e.to) || getD3Node(e.to),
-                        label : label
-                    };
-                    graphViz.addEdges([d3Edge]);
-                    return d3Edge;
-                }).bind(undefined, e), WAIT*i++);
+
+                        var d3Edge = {
+                            source: dbgObjectsToD3Objects.get(e.from) || getD3Node(e.from),
+                            target: dbgObjectsToD3Objects.get(e.to) || getD3Node(e.to),
+                            label : label
+                        };
+                        graphViz.addEdges([d3Edge]);
+
+                    }).bind(undefined, e), WAIT*i++);
+                }
 
                 if(i % 200 === 0)
                     console.log(i, 'edges');

@@ -27,6 +27,22 @@ dbg.uncaughtExceptionHook = function(e){
     console.error('uncaughtExceptionHook', e, e.stack);
 };
 
+Debugger.Object.prototype.byPath = function(path): Debugger.Object{
+
+    return path.split('.').reduce((acc, curr) => {
+        if(acc){
+            var desc = acc.getOwnPropertyDescriptor(curr);
+            if(!desc || !desc.value)
+                return undefined;
+            else
+                return desc.value;
+        }
+        else
+            return undefined;
+    }, this);
+
+};
+
 
 /*
  Traversing has to be a synchronous operation, otherwise the graph may change between turns.
@@ -41,13 +57,29 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
 
     // globalDebugObject represents the Window instance, while globalDebugObject.window represents the WindowProxy (see HTML5 spec for difference)
     // This results in two "twin global objects" being present for the global object.
-    //
     var windowProxyDebuggeeObject = globalDebugObject.getOwnPropertyDescriptor('window').value;
     windowProxyDebuggeeObject.root = true;
 
     todo.add(windowProxyDebuggeeObject);
 
-    console.log('number of own global props', globalDebugObject.getOwnPropertyNames().length);
+    //console.log('number of own global props', globalDebugObject.getOwnPropertyNames().length);
+
+
+    var debuggeeObjectPrototype = windowProxyDebuggeeObject.byPath('Object.prototype');
+    console.log('debuggeeObjectPrototype props', debuggeeObjectPrototype.getOwnPropertyNames());
+    // Checks if the debuggee object p is the default prototype of the f debuggee function object
+    function hasDefaultPrototype(func: Debugger.Object, proto: Debugger.Object){
+        var protoProps = proto.getOwnPropertyNames();
+
+        try{
+            var constructor = proto.getOwnPropertyDescriptor('constructor').value;
+        }
+        catch(e){
+            console.error('constructor is not a data property', proto.getOwnPropertyDescriptor('constructor'), e)
+            return false; // it's a trap !!
+        }
+        return protoProps.length === 1 && constructor === func && proto.proto === debuggeeObjectPrototype;
+    }
 
     while(todo.size !== 0){ // TODO for..of
 
@@ -56,51 +88,61 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
         while(todoIt){
 
             try{
-                var e = todoIt.next();
-                todo.delete(e);
-                done.add(e);
+                var inspected = todoIt.next();
+                todo.delete(inspected);
+                done.add(inspected);
 
                 // properties
-                var props = e.getOwnPropertyNames();
+                var props = inspected.getOwnPropertyNames();
 
-                graph.nodes.add(e);
+                graph.nodes.add(inspected);
 
                 props.forEach( p => { // TODO for..of
-
-                    var desc = e.getOwnPropertyDescriptor(p);
+                    var desc = inspected.getOwnPropertyDescriptor(p);
+                    var details;
 
                     // data property
                     var value = desc.value;
 
                     if(value instanceof Debugger.Object){
-                        graph.edges.add({from: e, to:value, details:{dataProperty: p}});
+                        details = {dataProperty: p};
+
+                        // these edges correspond to the default prototype object of a function. Marking them specially so they can be visually removed
+                        if((p === 'prototype' && inspected.callable && hasDefaultPrototype(inspected, value))
+                            || (p === 'constructor' && value.callable && hasDefaultPrototype(value, inspected))
+                            ){
+                            details.defaultPrototype = true;
+                        }
+
+                        graph.edges.add({from: inspected, to:value, details:details});
 
                         if(!done.has(value)){
                             todo.add(value);
                         }
                     }
                     else{
-                        // value is a primitive value
-                        //console.error(value === null || typeof value !== 'object', 'val should not be an object')
-                    }
+                        // value is a primitive value or p is an accessor
 
-                    // accessor
-                    var get = desc.get;
-                    if(get instanceof Debugger.Object){
-                        graph.edges.add({from: e, to:get, details:{getter: p}});
+                        // accessor
+                        var get = desc.get;
+                        if(get instanceof Debugger.Object){
+                            graph.edges.add({from: inspected, to:get, details:{getter: p}});
 
-                        if(!done.has(get)){
-                            todo.add(get);
+                            if(!done.has(get)){
+                                todo.add(get);
+                            }
                         }
-                    }
-                    var set = desc.set;
-                    if(set instanceof Debugger.Object){
-                        graph.edges.add({from: e, to:set, details:{setter: p}});
+                        var set = desc.set;
+                        if(set instanceof Debugger.Object){
+                            graph.edges.add({from: inspected, to:set, details:{setter: p}});
 
-                        if(!done.has(set)){
-                            todo.add(set);
+                            if(!done.has(set)){
+                                todo.add(set);
+                            }
                         }
+
                     }
+
                 });
 
                 // [[Prototype]]
