@@ -112,58 +112,12 @@ function build(frame, toolbox){
         var graphViz = overrides.graphViz;
 
         frame.document.querySelector('button').addEventListener('click', e => {
-            // var button = e.target;
-            // cleanup
-            //frame.document.body.textContent = '';
-            // put the button back in
-            //frame.document.appendChild(button);
 
-            //var MAX_ELEMS = Infinity;
-
-            /*var d3DrawingGraph = {
-                nodes : {
-                    add: function(o){
-                        //if(i>MAX_ELEMS)
-                        //  return;
-                        if(dbgObjectsToD3Objects.has(o))
-                            return dbgObjectsToD3Objects.get(o);
-
-                        var d3Node = {
-                            x: randInt1_n(1000),
-                            y: randInt1_n(600)
-                        };
-
-                        d3Nodes.push(d3Node);
-                        if(d3Nodes.length % 200 === 0)
-                            console.log(d3Nodes.length, 'nodes');
-
-                        dbgObjectsToD3Objects.set(o, d3Node);
-                        setTimeout( () => { graphViz.addNodes([d3Node]) }, WAIT*i++);
-                        return d3Node;
-                    }
-                },
-                edges :{
-                    add:function(e){
-                        //if(i>MAX_ELEMS)
-                        //  return;
-                        var d3Edge = {
-                            source: dbgObjectsToD3Objects.get(e.from) || d3DrawingGraph.nodes.add(e.from),
-                            target: dbgObjectsToD3Objects.get(e.to) || d3DrawingGraph.nodes.add(e.to)
-                        };
-                        setTimeout( () => { graphViz.addEdges([d3Edge]); }, WAIT*i++);
-                        return d3Edge;
-                    }
-                }
-            };*/
-
-
-
-            //console.time('clickGraph');
+            console.time('clickGraph');
             var clickGraph = new SimpleGraph();
             traverseGraph(targetGlobal, clickGraph);
-            //console.timeEnd('clickGraph');
+            console.timeEnd('clickGraph');
             console.log('click graph', clickGraph.nodes.size, clickGraph.edges.size);
-
 
 
             //console.time('differenceGraph');
@@ -214,6 +168,7 @@ function build(frame, toolbox){
             var dbgObjectsToD3Objects = new WeakMap();
             var nodeToEdges = differenceGraph.nodeToEdges;
             var d3Nodes = [];
+            var d3Edges = [];
 
             function getD3Node(dbgObjectNode){
                 if(dbgObjectsToD3Objects.has(dbgObjectNode))
@@ -273,15 +228,12 @@ function build(frame, toolbox){
                     d3Node.class = 'root';
 
                 dbgObjectsToD3Objects.set(dbgObjectNode, d3Node);
-                graphViz.addNodes([d3Node]);
                 //console.log('d3Node', d3Node);
                 return d3Node;
             }
 
-            var MAX = 300;
+            var MAX = 1000;
             var i = 0;
-            var WAIT = 30;
-            var from, to;
 
             while(diffGraphEdgeIt && i <= MAX){
                 try{
@@ -293,40 +245,38 @@ function build(frame, toolbox){
                 }
 
                 if(!e.details.defaultPrototype){
-                    setTimeout( ( e => {
-                        var label;
-                        var details = e.details;
+                    var label;
+                    var details = e.details;
 
-                        if(details.dataProperty){
-                            label = details.dataProperty
-                        }
-                        if(details.getter){
-                            label = '[[Getter]] '+details.getter
-                        }
-                        if(details.setter){
-                            label = '[[Setter]] '+details.setter
-                        }
+                    if(details.dataProperty){
+                        label = details.dataProperty
+                    }
+                    if(details.getter){
+                        label = '[[Getter]] '+details.getter
+                    }
+                    if(details.setter){
+                        label = '[[Setter]] '+details.setter
+                    }
 
 
-                        var d3Edge = {
-                            source: dbgObjectsToD3Objects.get(e.from) || getD3Node(e.from),
-                            target: dbgObjectsToD3Objects.get(e.to) || getD3Node(e.to),
-                            label : label
-                        };
-                        graphViz.addEdges([d3Edge]);
+                    var d3Edge = {
+                        source: dbgObjectsToD3Objects.get(e.from) || getD3Node(e.from),
+                        target: dbgObjectsToD3Objects.get(e.to) || getD3Node(e.to),
+                        label : label
+                    };
+                    d3Edges.push(d3Edge);
+                    i++;
 
-                    }).bind(undefined, e), WAIT*i++);
+                    if(i % 200 === 0)
+                        console.log(i, 'edges');
                 }
 
-                if(i % 200 === 0)
-                    console.log(i, 'edges');
             }
 
+            graphViz.addNodes(d3Nodes);
+            graphViz.addEdges(d3Edges);
+
             //console.timeEnd('draw difference graph');
-
-
-
-
 
         })
 
