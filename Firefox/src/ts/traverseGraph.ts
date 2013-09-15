@@ -81,6 +81,8 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
         return protoProps.length === 1 && constructor === func && proto.proto === debuggeeObjectPrototype;
     }
 
+    console.log("Debugger.Environment.prototype props", Object.getOwnPropertyNames(Debugger.Environment.prototype));
+
     while(todo.size !== 0){ // TODO for..of
 
         var todoIt = todo.values();
@@ -92,64 +94,114 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                 todo.delete(inspected);
                 done.add(inspected);
 
-                // properties
-                var props = inspected.getOwnPropertyNames();
-
                 graph.nodes.add(inspected);
 
-                props.forEach( p => { // TODO for..of
-                    var desc = inspected.getOwnPropertyDescriptor(p);
-                    var details;
+                if(inspected instanceof Debugger.Object){
+                    <Debugger.Object>inspected
+                    // properties
+                    var props = inspected.getOwnPropertyNames();
 
-                    // data property
-                    var value = desc.value;
+                    props.forEach( p => { // TODO for..of
+                        var desc = inspected.getOwnPropertyDescriptor(p);
+                        var details;
 
-                    if(value instanceof Debugger.Object){
-                        details = {dataProperty: p};
+                        // data property
+                        var value = desc.value;
 
-                        // these edges correspond to the default prototype object of a function. Marking them specially so they can be visually removed
-                        if((p === 'prototype' && inspected.callable && hasDefaultPrototype(inspected, value))
-                            || (p === 'constructor' && value.callable && hasDefaultPrototype(value, inspected))
-                            ){
-                            details.defaultPrototype = true;
-                        }
+                        if(value instanceof Debugger.Object){
+                            details = {dataProperty: p};
 
-                        graph.edges.add({from: inspected, to:value, details:details});
+                            // these edges correspond to the default prototype object of a function. Marking them specially so they can be visually removed
+                            if((p === 'prototype' && inspected.callable && hasDefaultPrototype(inspected, value))
+                                || (p === 'constructor' && value.callable && hasDefaultPrototype(value, inspected))
+                                ){
+                                details.defaultPrototype = true;
+                            }
 
-                        if(!done.has(value)){
-                            todo.add(value);
-                        }
-                    }
-                    else{
-                        // value is a primitive value or p is an accessor
+                            graph.edges.add({from: inspected, to:value, details:details});
 
-                        // accessor
-                        var get = desc.get;
-                        if(get instanceof Debugger.Object){
-                            graph.edges.add({from: inspected, to:get, details:{getter: p}});
-
-                            if(!done.has(get)){
-                                todo.add(get);
+                            if(!done.has(value)){
+                                todo.add(value);
                             }
                         }
-                        var set = desc.set;
-                        if(set instanceof Debugger.Object){
-                            graph.edges.add({from: inspected, to:set, details:{setter: p}});
+                        else{
+                            // value is a primitive value or p is an accessor
 
-                            if(!done.has(set)){
-                                todo.add(set);
+                            // accessor
+                            var get = desc.get;
+                            if(get instanceof Debugger.Object){
+                                graph.edges.add({from: inspected, to:get, details:{getter: p}});
+
+                                if(!done.has(get)){
+                                    todo.add(get);
+                                }
                             }
+                            var set = desc.set;
+                            if(set instanceof Debugger.Object){
+                                graph.edges.add({from: inspected, to:set, details:{setter: p}});
+
+                                if(!done.has(set)){
+                                    todo.add(set);
+                                }
+                            }
+
                         }
 
+                    });
+
+                    // [[Prototype]]
+
+                    // [[WeakMapData]] [[MapData]] [[SetData]]
+
+                    // lexical scope for a function
+                    var environment = inspected.environment;
+                    if(environment instanceof Debugger.Environment){
+                        graph.edges.add({from: inspected, to:environment, details:{"environment": true}});
+
+                        if(!done.has(environment)){ // probably useless test TODO investigate
+                            todo.add(environment);
+                        }
                     }
 
-                });
+                }
 
-                // [[Prototype]]
+                if(inspected instanceof Debugger.Environment){
+                    <Debugger.Environment>inspected
+                    var parent = inspected.parent;
+                    if(parent instanceof Debugger.Environment){
+                        graph.edges.add({from: inspected, to:parent, details:{"parent environment": true}});
+                        if(!done.has(parent)){
+                            todo.add(parent);
+                        }
+                    }
 
-                // [[WeakMapData]] [[MapData]] [[SetData]]
+                    var variableNames = inspected.names();
+                    variableNames.forEach(v => {
+                        if(v === 'arguments')
+                            return; // just ignore it
 
-                // lexical scope for a function
+                        //var value = inspected.getVariableDescriptor(v).value; // not implemented yet
+                        try{
+                            var value = inspected.getVariable(v);
+                        }
+                        catch(e){
+                            console.error('inspected.getVariable error', v, e);
+                            return;
+                        }
+
+                        if(value instanceof Debugger.Object){
+                            var details = {variable: v};
+
+                            graph.edges.add({from: inspected, to:value, details:details});
+
+                            if(!done.has(value)){
+                                todo.add(value);
+                            }
+                        }
+                    })
+
+                }
+
 
             }
             catch(e){

@@ -11,6 +11,8 @@ interface Global{}
 
 declare module Debugger{
     export class Object{
+        environment: Debugger.Environment
+
         toJSON(): string
         toString(): string
         getOwnPropertyNames() : string[]
@@ -27,8 +29,14 @@ declare module Debugger{
         source : Debugger.Source
         getAllOffsets() : ScriptOffsets[]
         getChildScripts() : Debugger.Script[]
-
     }
+
+    export class Environment{
+        parent: Debugger.Environment
+        names(): string[]
+        getVariable(v): any
+    }
+
     export class Source{
         text: string
     }
