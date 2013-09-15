@@ -20,14 +20,87 @@
 
     var graphBSPTree;
 
-    function tick() {
-        link.attr("x1", function(d) { return d.source.x; })
-            .attr("y1", function(d) { return d.source.y; })
-            .attr("x2", function(d) { return d.target.x; })
-            .attr("y2", function(d) { return d.target.y; });
+    var moveItems = (function(){
+        var todoNode = 0;
+        var todoLink = 0;
+        var MAX_NODES = 200;
+        var MAX_LINKS = MAX_NODES/2;
 
-        node.attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; });
+        var restart = false;
+
+        function moveSomeNodes(){
+            var n;
+            var goal = Math.min(todoNode+MAX_NODES, node[0].length);
+
+            for(var i=todoNode ; i < goal ; i++){
+                n = node[0][i];
+                n.setAttribute('cx', n.__data__.x);
+                n.setAttribute('cy', n.__data__.y);
+            }
+
+            todoNode = goal;
+            requestAnimationFrame(moveSome)
+        }
+
+        function moveSomeLinks(){
+            var l;
+            var goal = Math.min(todoLink+MAX_LINKS, link[0].length);
+
+            for(var i=todoLink ; i < goal ; i++){
+                l = link[0][i];
+                //console.log(l);
+                l.setAttribute('x1', l.__data__.source.x);
+                l.setAttribute('y1', l.__data__.source.y);
+                l.setAttribute('x2', l.__data__.target.x);
+                l.setAttribute('y2', l.__data__.target.y);
+            }
+
+            todoLink = goal;
+            requestAnimationFrame(moveSome)
+        }
+
+        function moveSome(){
+            //console.time('moveSome')
+            if(todoNode < node[0].length) // some more nodes to do
+                moveSomeNodes()
+            else{ // nodes are done
+                if(todoLink < link[0].length) // some more links to do
+                    moveSomeLinks()
+                else{ // both nodes and links are done
+                    if(restart){
+                        restart = false;
+                        todoNode = 0;
+                        todoLink = 0;
+                        requestAnimationFrame(moveSome);
+                    }
+                }
+            }
+            //console.timeEnd('moveSome')
+        }
+
+
+        return function moveItems(){
+            if(!restart){
+                restart = true;
+                requestAnimationFrame(moveSome);
+            }
+        };
+
+    })();
+
+    var ticks = []
+
+    function tick() {
+        ticks.push(performance.now());
+        moveItems();
+
+        /*link.attr("x1", function(d) { return d.source.x; })
+         .attr("y1", function(d) { return d.source.y; })
+         .attr("x2", function(d) { return d.target.x; })
+         .attr("y2", function(d) { return d.target.y; });
+
+         node.attr("cx", function(d) { return d.x; })
+         .attr("cy", function(d) { return d.y; });*/
 
         // things moved, invalidating tree
         graphBSPTree = undefined;
@@ -40,27 +113,8 @@
 
         link.enter().insert("line", ".node")
             .attr("class", "link")
-            .attr("stroke-width", 3)
-            .attr('title', e => e.label)
-            /*.on('mouseover', e => {
-                svg.append('text')
-                    .attr('class', 'label')
-                    .attr("x", function() { return (e.source.x + e.target.x) / 2; })
-                    .attr("y", function() { return (e.source.y + e.target.y) / 2; })
-                    .attr("text-anchor", "middle")
-                    .text(e.label);
-            })
-            .on('mouseleave', e => {
-                svg.selectAll("text.label").remove();
-            });*/
-
-        /*labels = labels.data(links);
-
-        labels.enter().append('text')
-            .attr("x", function(d) { return (d.source.y + d.target.y) / 2; })
-            .attr("y", function(d) { return (d.source.x + d.target.x) / 2; })
-            .attr("text-anchor", "middle")
-            .text(e => e.label);*/
+            .attr("stroke-width", 2)
+            .attr('title', e => e.label);
 
         node = node.data(nodes);
 
@@ -242,6 +296,7 @@
 
 
     force.on('end', function(){
+        console.log('ticks', ticks)
 
         console.time('BSP tree');
         // nodes + edges
