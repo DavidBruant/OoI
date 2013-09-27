@@ -112,7 +112,7 @@
         // directed graph http://bl.ocks.org/rkirsling/5001347
 
         link.enter().insert("line", ".node")
-            .attr("class", "link")
+            .attr("class", e => e.class? "link "+ e.class : "link")
             .attr("stroke-width", 2)
             .attr('title', e => e.label);
 
@@ -124,6 +124,8 @@
             .call(force.drag);
 
         force.start();
+        for (var i = 20; i > 0; --i)
+            force.tick(); // do a couple iterations to begin with
     }
 
     //document.addEventListener('DOMContentLoaded', e => {
@@ -200,7 +202,7 @@
 
         if(!graphBSPTree){
             graphBSPTree = new ScreenTreeNode(0, width, height, 0, getGraphBSPPoints());
-            graphBSPTree.recursiveSplit(3); // more coarse grain so the split is a bit faster
+            graphBSPTree.recursiveSplit(10); // more coarse grain so the split is a bit faster
         }
 
         var candidates = [];
@@ -296,7 +298,7 @@
 
 
     force.on('end', function(){
-        console.log('ticks', ticks)
+        console.log('ticks', ticks);
 
         console.time('BSP tree');
         // nodes + edges

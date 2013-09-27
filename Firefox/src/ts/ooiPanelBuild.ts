@@ -177,7 +177,7 @@ function build(frame, toolbox){
                 var nodeEdges = nodeToEdges.get(dbgObjectNode);
                 var d3Node;
 
-                var influencingEdgesCount = 0;
+                /*var influencingEdgesCount = 0;
                 if(nodeEdges && nodeEdges.length > 0){
                     nodeEdges.forEach( edge => {
                         // dbgObjectNode === edge.from || edge.to
@@ -203,19 +203,19 @@ function build(frame, toolbox){
 
 
                     })
-                }
+                }*/
 
                 // divide by number of influencing coords
-                if(influencingEdgesCount === 0){
+                //if(influencingEdgesCount === 0){
                     d3Node = { // random by default
                         x: randInt1_n(1000),
                         y: randInt1_n(600)
                     };
-                }
+                /*}
                 else{
                     d3Node.x /= influencingEdgesCount;
                     d3Node.y /= influencingEdgesCount;
-                }
+                }*/
 
                 d3Nodes.push(d3Node);
                 if(d3Nodes.length % 200 === 0)
@@ -227,12 +227,16 @@ function build(frame, toolbox){
                 if(dbgObjectNode.root)
                     d3Node.class = 'root';
 
+                if(dbgObjectNode.callee) // instanceof Debugger.Environment
+                    d3Node.class = 'scope';
+
                 dbgObjectsToD3Objects.set(dbgObjectNode, d3Node);
                 //console.log('d3Node', d3Node);
                 return d3Node;
             }
 
-            var MAX = 1000;
+
+            var MAX = 900;
             var i = 0;
 
             while(diffGraphEdgeIt && i <= MAX){
@@ -248,22 +252,30 @@ function build(frame, toolbox){
                     var label;
                     var details = e.details;
 
-                    if(details.dataProperty){
-                        label = details.dataProperty
-                    }
-                    if(details.getter){
-                        label = '[[Getter]] '+details.getter
-                    }
-                    if(details.setter){
-                        label = '[[Setter]] '+details.setter
-                    }
-
-
-                    var d3Edge = {
+                    var d3Edge = <any>{
                         source: dbgObjectsToD3Objects.get(e.from) || getD3Node(e.from),
-                        target: dbgObjectsToD3Objects.get(e.to) || getD3Node(e.to),
-                        label : label
+                        target: dbgObjectsToD3Objects.get(e.to) || getD3Node(e.to)
                     };
+
+                    // label
+                    if(details.dataProperty)
+                        d3Edge.label = details.dataProperty;
+                    if(details.getter)
+                        d3Edge.label = '[[Getter]] '+details.getter;
+                    if(details.setter)
+                        d3Edge.label = '[[Setter]] '+details.setter;
+                    if(details.variable)
+                        d3Edge.label = details.variable;
+
+                    // class
+                    if(details.variable)
+                        d3Edge.class = 'variable';
+                    if(details.type === 'parent-scope')
+                        d3Edge.class = 'parent-scope';
+                    if(details.type === 'lexical-scope')
+                        d3Edge.class = 'lexical-scope';
+
+
                     d3Edges.push(d3Edge);
                     i++;
 

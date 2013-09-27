@@ -23,19 +23,26 @@
                 fill: indianred;
             }
 
-            text{
-                /*display: none;*/
+            .node.scope{
+                fill: #4b802a;
             }
 
 
             .link {
-                stroke: #999;
+                stroke: #aaaaaa;
             }
 
-            .link:hover{
-                color: darkgreen;
+            .link.variable{
+                stroke: purple;
             }
 
+            .link.parent-scope{
+                stroke: black;
+            }
+
+            .link.lexical-scope{
+                stroke: orange;
+            }
 
             /*text { pointer-events: none; font: 9px sans-serif; fill: #000000; }*/
 

@@ -97,7 +97,7 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                 graph.nodes.add(inspected);
 
                 if(inspected instanceof Debugger.Object){
-                    <Debugger.Object>inspected
+                    <Debugger.Object>inspected;
                     // properties
                     var props = inspected.getOwnPropertyNames();
 
@@ -156,7 +156,7 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                     // lexical scope for a function
                     var environment = inspected.environment;
                     if(environment instanceof Debugger.Environment){
-                        graph.edges.add({from: inspected, to:environment, details:{"environment": true}});
+                        graph.edges.add({from: inspected, to:environment, details:{type: "lexical-scope"}});
 
                         if(!done.has(environment)){ // probably useless test TODO investigate
                             todo.add(environment);
@@ -166,10 +166,10 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                 }
 
                 if(inspected instanceof Debugger.Environment){
-                    <Debugger.Environment>inspected
+                    <Debugger.Environment>inspected;
                     var parent = inspected.parent;
                     if(parent instanceof Debugger.Environment){
-                        graph.edges.add({from: inspected, to:parent, details:{"parent environment": true}});
+                        graph.edges.add({from: inspected, to:parent, details:{type: "parent-scope"}});
                         if(!done.has(parent)){
                             todo.add(parent);
                         }
@@ -178,7 +178,7 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                     var variableNames = inspected.names();
                     variableNames.forEach(v => {
                         if(v === 'arguments')
-                            return; // just ignore it
+                            return; // just ignore it https://bugzilla.mozilla.org/show_bug.cgi?id=916499
 
                         //var value = inspected.getVariableDescriptor(v).value; // not implemented yet
                         try{

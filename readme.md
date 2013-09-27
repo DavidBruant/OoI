@@ -11,7 +11,7 @@ To have this working:
 1. run ````cfx run ooi.xpi```` to play with the addon (use the ````-b <path>```` option to provide a specific Firefox binary if appropriate)
 
 
-In development, go to directory root and do:
+In development, go to directory root and do (assuming you already have Grunt installed):
 
 1. ````grunt watch````
 
