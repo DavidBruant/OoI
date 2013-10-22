@@ -8,6 +8,7 @@ To have this working:
 
 1. Get [cfx](https://addons.mozilla.org/en-US/developers/docs/sdk/latest/dev-guide/tutorials/getting-started-with-cfx.html)
 1. run ````cfx xpi```` at the root of the Firefox directory
+1. ````grunt typescript````
 1. run ````cfx run ooi.xpi```` to play with the addon (use the ````-b <path>```` option to provide a specific Firefox binary if appropriate)
 
 
