@@ -1,6 +1,13 @@
 ( () => {
     "use strict";
 
+    /**
+    * This file draws the graph. It only needs to know about the part that's being drawn
+    * On expand, however, it needs to know what's new to draw
+    * Need a different graph representation (based on edges, P2P traversing)
+    * 
+    */
+  
     var width = 1300,
         height = 700;
 
@@ -336,7 +343,12 @@
         latestMouseMoveEvent = e;
     });
 
-    global.graphViz = {
+    global.drawGraph = function drawGraph(dataGraph){
+        // store it
+        
+        
+        
+        
         addNodes: function(newNodes){
             Array.prototype.push.apply(nodes, newNodes); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
             restart();
@@ -349,3 +361,26 @@
     };
 
 })();
+
+/**
+ thoughts for collapse/expand
+
+ When a node is clicked:
+ 1) List all paths from global to Node
+ 2) traverse all outgoing refs
+ 3) if a node from one of the path from 1) is found (except the clicked node), abort (show the path in red?)
+ otherwise make all traversed nodes disappear
+
+
+ */
+
+
+
+
+
+
+
+
+
+
+

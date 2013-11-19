@@ -2,7 +2,7 @@
 
 "use strict";
 
-export class SimpleGraphNode implements GraphNode{
+export class SimpleGraphNode implements GraphVertex{
 
 }
 

@@ -47,7 +47,7 @@ Debugger.Object.prototype.byPath = function(path): Debugger.Object{
 /*
  Traversing has to be a synchronous operation, otherwise the graph may change between turns.
 */
-function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
+function traverseGraph(window, graph: Graph<GraphVertex, GraphEdge<GraphVertex>>){
     var globalDebugObject = dbg.addDebuggee(window);
 
     var done = new Set();

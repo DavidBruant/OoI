@@ -236,7 +236,7 @@ function build(frame, toolbox){
             }
 
 
-            var MAX = 900;
+            var MAX = 800;
             var i = 0;
 
             while(diffGraphEdgeIt && i <= MAX){
