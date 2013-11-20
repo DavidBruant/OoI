@@ -85,14 +85,12 @@ export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
         var e;
         var from, to;
 
-        while(edgeIt){
-            try{
-                e = edgeIt.next();
-            }
-            catch(e){
-                if(e instanceof StopIteration)
-                    break;
-            }
+        while(true){ // TODO for..of
+            var next = edgeIt.next();
+            if(next.done)
+                break;
+            
+            e = next.value;
 
             from = e.from;
             to = e.to;

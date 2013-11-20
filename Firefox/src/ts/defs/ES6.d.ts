@@ -24,11 +24,14 @@ interface SetI<V>{
     size? : number // TODO change to a getter when https://typescript.codeplex.com/workitem/260 is fixed
 }
 
+interface Iteration<V>{
+    value: V
+    done: boolean
+}
+
 interface Iterator<V>{
-    next(): V
+    next(): Iteration<V>
 }
 
 declare function Proxy(target, handler) : void
 declare function WeakMap() : void
-
-declare class StopIteration{}
