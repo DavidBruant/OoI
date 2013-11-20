@@ -126,34 +126,30 @@ function build(frame, toolbox){
             var differenceGraph = new SimpleGraph();
 
             var clickGraphNodesIt = clickGraph.nodes.values();
-            while(clickGraphNodesIt){
-                try{
-                    var n = clickGraphNodesIt.next();
-                    if(!relatedPreScriptGraph.nodes.has(n)){
-                        differenceGraph.nodes.add(n);
-                    }
-                }
-                catch(e){
-                    if(e instanceof StopIteration)
-                        clickGraphNodesIt = undefined;
-                    else
-                        console.error('node iteration error', e)
+            while(true){
+                var next = clickGraphNodesIt.next();
+                
+                if(next.done)
+                    break;
+                
+                var n = next.value;
+                
+                if(!relatedPreScriptGraph.nodes.has(n)){
+                    differenceGraph.nodes.add(n);
                 }
             }
 
             var clickGraphEdgesIt = clickGraph.edges.values();
-            while(clickGraphEdgesIt){
-                try{
-                    var e = clickGraphEdgesIt.next();
-                    if(differenceGraph.nodes.has(e.from) || differenceGraph.nodes.has(e.to)){
-                        differenceGraph.edges.add(e); // TODO make sure additional prescript nodes are added to the graph
-                    }
-                }
-                catch(e){
-                    if(e instanceof StopIteration)
-                        clickGraphEdgesIt = undefined;
-                    else
-                        console.error('edge iteration error', e)
+            while(true){
+                var next = clickGraphEdgesIt.next();
+                
+                if(next.done)
+                    break;
+                
+                var e = next.value;
+            
+                if(differenceGraph.nodes.has(e.from) || differenceGraph.nodes.has(e.to)){
+                    differenceGraph.edges.add(e); // TODO make sure additional prescript nodes are added to the graph
                 }
             }
             //console.timeEnd('differenceGraph');
@@ -239,14 +235,13 @@ function build(frame, toolbox){
             var MAX = 900;
             var i = 0;
 
-            while(diffGraphEdgeIt && i <= MAX){
-                try{
-                    e = diffGraphEdgeIt.next();
-                }
-                catch(e){
-                    if(e instanceof StopIteration)
-                        break;
-                }
+            while(i <= MAX){
+                var next = diffGraphEdgeIt.next();
+                
+                if(next.done)
+                    break;
+                
+                e = next.value;
 
                 if(!e.details.defaultPrototype){
                     var label;
