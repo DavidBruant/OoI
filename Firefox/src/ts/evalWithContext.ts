@@ -1,4 +1,4 @@
-/// <reference path="./defs/ES6.ts"/>
+/// <reference path="./defs/ES6.d.ts"/>
 
 "DO NOT use strict";
 

@@ -5,7 +5,7 @@ import utils = require("tabs/utils");
 var getTabContentWindow = utils.getTabContentWindow;
 
 
-function getSDKTabContentWindow(sdkTab){
+function getSDKTabContentWindow(sdkTab: SdkTab){
     return getTabContentWindow( sdkTabToXulTab(sdkTab) );
 }
 

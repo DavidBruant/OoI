@@ -18,7 +18,6 @@ module.exports = function(grunt) {
 					target: 'es5',
 					sourcemap: true,
 					base_path: 'Firefox/src/ts',
-					fullSourceMapPath: true,
 					declaration: true
 				}
 			}

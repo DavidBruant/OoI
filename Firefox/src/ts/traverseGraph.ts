@@ -1,10 +1,18 @@
+/// <reference path="./defs/Debugger.d.ts" />
+
 "use strict";
 
 import chrome = require("chrome");
+import ConnectedGraphImports = require('./ConnectedGraph');
+
 var Cu = chrome.Cu;
 
 var addDebuggerToGlobal = Cu.import("resource://gre/modules/jsdebugger.jsm").addDebuggerToGlobal;
 addDebuggerToGlobal(this); // Ignore TypeScript compiler warning for here
+
+var ConnectedGraphVertex = ConnectedGraphImports.ConnectedGraphVertex;
+var ConnectedGraphEdge = ConnectedGraphImports.ConnectedGraphEdge;
+var ConnectedGraph = ConnectedGraphImports.ConnectedGraph;
 
 
 Debugger.Object.prototype.toString = function(){
@@ -47,8 +55,7 @@ Debugger.Object.prototype.byPath = function(path): Debugger.Object{
 /*
  Traversing has to be a synchronous operation, otherwise the graph may change between turns.
 */
-
-function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
+function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdge<GraphVertex>>){
     console.log('traverse'); 
     var globalDebugObject = dbg.addDebuggee(window);
 
@@ -103,12 +110,12 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
             graph.nodes.add(inspected);
 
             if(inspected instanceof Debugger.Object){
-                <Debugger.Object>inspected;
+                var inspectedObj = <Debugger.Object> inspected;
                 // properties
-                var props = inspected.getOwnPropertyNames();
+                var props = inspectedObj.getOwnPropertyNames();
 
                 props.forEach( p => { // TODO for..of
-                    var desc = inspected.getOwnPropertyDescriptor(p);
+                    var desc = inspectedObj.getOwnPropertyDescriptor(p);
                     var details;
 
                     // data property
@@ -118,13 +125,13 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                         details = {dataProperty: p};
 
                         // these edges correspond to the default prototype object of a function. Marking them specially so they can be visually removed
-                        if((p === 'prototype' && inspected.callable && hasDefaultPrototype(inspected, value))
-                            || (p === 'constructor' && value.callable && hasDefaultPrototype(value, inspected))
+                        if((p === 'prototype' && inspectedObj.callable && hasDefaultPrototype(inspectedObj, value))
+                            || (p === 'constructor' && value.callable && hasDefaultPrototype(value, inspectedObj))
                             ){
                             details.defaultPrototype = true;
                         }
 
-                        graph.edges.add({from: inspected, to:value, details:details});
+                        graph.edges.add({from: inspectedObj, to:value, details:details});
 
                         if(!done.has(value)){
                             todo.add(value);
@@ -136,7 +143,7 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                         // accessor
                         var get = desc.get;
                         if(get instanceof Debugger.Object){
-                            graph.edges.add({from: inspected, to:get, details:{getter: p}});
+                            graph.edges.add({from: inspectedObj, to:get, details:{getter: p}});
 
                             if(!done.has(get)){
                                 todo.add(get);
@@ -144,7 +151,7 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                         }
                         var set = desc.set;
                         if(set instanceof Debugger.Object){
-                            graph.edges.add({from: inspected, to:set, details:{setter: p}});
+                            graph.edges.add({from: inspectedObj, to:set, details:{setter: p}});
 
                             if(!done.has(set)){
                                 todo.add(set);
@@ -160,9 +167,9 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                 // [[WeakMapData]] [[MapData]] [[SetData]]
 
                 // lexical scope for a function
-                var environment = inspected.environment;
+                var environment = inspectedObj.environment;
                 if(environment instanceof Debugger.Environment){
-                    graph.edges.add({from: inspected, to:environment, details:{type: "lexical-scope"}});
+                    graph.edges.add({from: inspectedObj, to:environment, details:{type: "lexical-scope"}});
 
                     if(!done.has(environment)){ // probably useless test TODO investigate
                         todo.add(environment);
@@ -172,23 +179,24 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
             }
 
             if(inspected instanceof Debugger.Environment){
-                <Debugger.Environment>inspected;
-                var parent = inspected.parent;
+                var inspectedEnv = <Debugger.Environment> inspected;
+                
+                var parent = inspectedEnv.parent;
                 if(parent instanceof Debugger.Environment){
-                    graph.edges.add({from: inspected, to:parent, details:{type: "parent-scope"}});
+                    graph.edges.add({from: inspectedEnv, to:parent, details:{type: "parent-scope"}});
                     if(!done.has(parent)){
                         todo.add(parent);
                     }
                 }
 
-                var variableNames = inspected.names();
+                var variableNames = inspectedEnv.names();
                 variableNames.forEach(v => {
                     if(v === 'arguments')
                         return; // just ignore it https://bugzilla.mozilla.org/show_bug.cgi?id=916499
 
                     //var value = inspected.getVariableDescriptor(v).value; // not implemented yet
                     try{
-                        var value = inspected.getVariable(v);
+                        var value = inspectedEnv.getVariable(v);
                     }
                     catch(e){
                         console.error('inspected.getVariable error', v, e);
@@ -198,7 +206,7 @@ function traverseGraph(window, graph: Graph<GraphNode, GraphEdge<GraphNode>>){
                     if(value instanceof Debugger.Object){
                         var details = {variable: v};
 
-                        graph.edges.add({from: inspected, to:value, details:details});
+                        graph.edges.add({from: inspectedEnv, to:value, details:details});
 
                         if(!done.has(value)){
                             todo.add(value);

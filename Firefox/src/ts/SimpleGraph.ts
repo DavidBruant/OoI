@@ -6,81 +6,21 @@ export class SimpleGraphNode implements GraphVertex{
 
 }
 
-export class SimpleNodeSet implements GraphNodeSet<SimpleGraphNode>{
-
-    private set : Set<SimpleGraphNode>
-    private graph : Graph<SimpleGraphNode,  SimpleGraphEdge>
-
-    constructor () {
-        this.set = new Set();
-    }
-
-    add(n: SimpleGraphNode){
-        this.set.add(n);
-    }
-    has(n: SimpleGraphNode){
-        return this.set.has(n)
-    }
-    delete(/*n: SimpleGraphNode*/){
-        // TODO remove related edges
-        throw 'TODO';
-    }
-    get size(){
-        return this.set.size
-    }
-    values(){
-        return this.set.values();
-    }
-}
-
 export class SimpleGraphEdge implements GraphEdge<SimpleGraphNode>{
-    from
-    to
-}
-
-export class SimpleEdgeSet implements GraphEdgeSet{
-
-    private set : Set<SimpleGraphEdge>
-    public graph: SimpleGraph
-
-    constructor(){
-        this.set = new Set();
-    }
-
-    add(e: SimpleGraphEdge){
-        // add nodes if not already in the graph
-        if(!this.graph.nodes.has(e.from))
-            this.graph.nodes.add(e.from);
-
-        if(!this.graph.nodes.has(e.to))
-            this.graph.nodes.add(e.to);
-
-        this.set.add(e);
-    }
-    has(e: SimpleGraphEdge){
-        return this.set.has(e);
-    }
-    delete(){
-
-    }
-    get size(){
-        return this.set.size
-    }
-    values(){
-        return this.set.values();
-    }
+    from: SimpleGraphNode
+    to: SimpleGraphNode
 }
 
 export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
-    nodes = <SimpleNodeSet> new Set();
-    edges = <SimpleEdgeSet> new Set();
+    nodes = new Set<SimpleGraphNode>();
+    edges = new Set<SimpleGraphEdge>();
 
     constructor(){
-        this.edges.graph = this;
+        //this.edges.graph = this;
     }
 
     get nodeToEdges(){
-        var ret = new WeakMap();
+        var ret = new WeakMap<SimpleGraphNode, SimpleGraphEdge[]>();
         var edgeIt = this.edges.values();
         var e;
         var from, to;

@@ -59,7 +59,7 @@ interface DevToolDescription{
     icon: string
     url: string
     label: string
-    isTargetSupported: (target : DevToolsTarget) => bool
+    isTargetSupported: (target : DevToolsTarget) => boolean
     build: (frame: HTMLIFrameElement, toolbox : DevToolsToolbox) => JetpackPromise<DevToolsPanel>
 }
 

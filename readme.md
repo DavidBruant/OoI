@@ -18,3 +18,8 @@ In development, go to directory root and do (assuming you already have Grunt ins
 # Licence
 
 [MIT](./licence)
+
+# Random stuffs
+
+``cfx test -b /home/david/Logiciel/aurora/firefox``
+``cfx xpi ; cfx -b /home/david/Logiciel/aurora/firefox run ooi.xpi ``

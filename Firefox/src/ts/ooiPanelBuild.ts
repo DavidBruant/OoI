@@ -1,5 +1,3 @@
-/// <reference path="./defs/console.d.ts" />
-
 "use strict";
 
 import tabs = require('tabs');
@@ -49,11 +47,12 @@ var svgpanSource = data.load('src/svgpan.js');
  }*/
 
 
-// TODO SimpleGraph on button click
-// TODO compute the difference between the graph on click and the initial graph
-// TODO draw this difference
+// TODO use a ConnectedGraph
+// TODO reconsider the first traversal (stop at a smaller number, but provide the
+// possibility to expand)
 
-var globalToPreScriptGraph = new WeakMap();
+
+var globalToPreScriptGraph = new WeakMap<ContentWindow, Graph/*<GraphVertex, GraphEdge<GraphVertex>*/>();
 
 // Create a graph at the entrance of each global
 events.on("content-document-global-created", e => {
@@ -95,7 +94,7 @@ function build(frame, toolbox){
         frame.requestAnimationFrame(callback)
     }
 
-    frame.document.addEventListener('DOMContentLoaded', e => {
+    frame.document.addEventListener('DOMContentLoaded', ev => {
         var overrides = <any> {
             setTimeout: setTimeout,
             clearTimeout: clearTimeout,
@@ -127,12 +126,12 @@ function build(frame, toolbox){
 
             var clickGraphNodesIt = clickGraph.nodes.values();
             while(true){
-                var next = clickGraphNodesIt.next();
+                var nextNode = clickGraphNodesIt.next();
                 
-                if(next.done)
+                if(nextNode.done)
                     break;
                 
-                var n = next.value;
+                var n = nextNode.value;
                 
                 if(!relatedPreScriptGraph.nodes.has(n)){
                     differenceGraph.nodes.add(n);
@@ -146,10 +145,10 @@ function build(frame, toolbox){
                 if(next.done)
                     break;
                 
-                var e = next.value;
+                var edge = next.value;
             
-                if(differenceGraph.nodes.has(e.from) || differenceGraph.nodes.has(e.to)){
-                    differenceGraph.edges.add(e); // TODO make sure additional prescript nodes are added to the graph
+                if(differenceGraph.nodes.has(edge.from) || differenceGraph.nodes.has(edge.to)){
+                    differenceGraph.edges.add(edge); // TODO make sure additional prescript nodes are added to the graph
                 }
             }
             //console.timeEnd('differenceGraph');
