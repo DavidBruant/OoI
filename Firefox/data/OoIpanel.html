@@ -1,60 +1,71 @@
 <!DOCTYPE html>
 <html>
     <head>
-
         <meta charset="utf-8">
-
+        
         <style>
-
             rect {
                 fill: none;
                 pointer-events: all;
             }
-
+            
             .node {
                 fill: #000;
             }
-
+            
             .node.root{
                 fill: deepskyblue;
             }
-
+            
             .node.function{
                 fill: indianred;
             }
-
+            
             .node.scope{
                 fill: #4b802a;
             }
-
-
+            
+            
             .link {
                 stroke: #aaaaaa;
             }
-
+            
             .link.variable{
                 stroke: purple;
             }
-
+            
             .link.parent-scope{
                 stroke: black;
             }
-
+            
             .link.lexical-scope{
                 stroke: orange;
             }
-
+            
             /*text { pointer-events: none; font: 9px sans-serif; fill: #000000; }*/
-
+            
             /*.link:hover text{
-                display: block;
-            }*/
-
+            display: block;
+        }*/
+            
         </style>
+        
+        <!--
+        Code here is only doing graphics
+        -->
+        
+        <script src="d3/d3.v3.js"> </script>
+        <script src="src/2DBSP.js"> </script>
+        <script src="src/force.js"> </script>
+        <script src="src/svgpan.js"> </script>
+        <script>
+            
+        </script>
+        
     </head>
-
+    
     <body>
         <button>Graph!</button>
     </body>
-
+    
 </html>

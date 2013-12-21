@@ -41,7 +41,7 @@ export function main(){
         id: 'OoI',
         icon: "chrome://browser/skin/devtools/tool-inspector.png",
         // https://github.com/mozilla/mozilla-central/blob/1886faa9e2f7ccede29d0f5696a423997322978b/browser/devtools/framework/toolbox.js#L473
-        url: data.url("OoIpanel.html"),
+        url: data.url("devtool-panel.html"),
         label: "Object of Interest",
         isTargetSupported: function(target){
             return true; // TODO figure out what's up here
