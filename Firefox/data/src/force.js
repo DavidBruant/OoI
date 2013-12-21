@@ -7,7 +7,7 @@
     * Need a different graph representation (based on edges, P2P traversing)
     */
 
-    document.addEventListener('DOMContentLoaded', e => {
+    var onDOMContentLoaded = e => {
         var width = 1300,
             height = 700;
     
@@ -345,16 +345,23 @@
     
         global.graphViz = {
             addNodes: function(newNodes){
+                console.log('addNodes', newNodes.length)
                 Array.prototype.push.apply(nodes, newNodes); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
                 restart();
             },
             addEdges: function (newEdges){
+                console.log('addEdges', newEdges.length)
                 Array.prototype.push.apply(links, newEdges); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
                 restart();
             },
             nodes: nodes
         };
-    })
+    };
+
+    if(document.readyState !== "complete")
+        document.addEventListener('DOMContentLoaded', onDOMContentLoaded)
+    else
+        onDOMContentLoaded();
 
 })(this);
 

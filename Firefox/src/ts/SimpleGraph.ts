@@ -52,6 +52,47 @@ export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
 
         return ret;
     }
+    
+    toJSON(){
+        console.log('toJSON');
+        
+        var nodes = [];
+    
+        var getId = (() => {
+            var wm = new WeakMap<SimpleGraphNode, number>();
+            var nextId = 0;
+    
+            return n => {
+                var id = wm.get(n);
+                if(id === undefined){
+                    id = nextId++;
+                    nodes.push({id: id});
+                    wm.set(n, id);
+                }
+    
+                return id;
+            };
+        })();
+    
+        var edges = [];
+        this.edges.forEach(e => {
+            edges.push({
+                from: getId(e.from),
+                to: getId(e.to)
+            });
+        });
+    
+        var serializable = {
+            nodes: nodes,
+            edges: edges
+        };
+
+        console.log('JSON.stringify(serializable).length', JSON.stringify(serializable).length);
+    
+        return serializable;
+    }
+    
+    
 }
 
 
