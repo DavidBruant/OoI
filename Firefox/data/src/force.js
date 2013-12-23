@@ -30,7 +30,7 @@
         var moveItems = (function(){
             var todoNode = 0;
             var todoLink = 0;
-            var MAX_NODES = 200;
+            var MAX_NODES = 150;
             var MAX_LINKS = MAX_NODES/2;
     
             var restart = false;
@@ -131,7 +131,7 @@
                 .call(force.drag);
     
             force.start();
-            for (var i = 20; i > 0; --i)
+            for (var i = 4; i > 0; --i)
                 force.tick(); // do a couple iterations to begin with
         }
     
@@ -291,6 +291,7 @@
     
         function playPauseToggle(){
             var alpha = force.alpha();
+            console.log('playPauseToggle', alpha, previousAlpha);
     
             if(alpha){
                 force.stop();
@@ -307,11 +308,11 @@
         force.on('end', function(){
             console.log('ticks', ticks);
     
-            console.time('BSP tree');
+            //console.time('BSP tree');
             // nodes + edges
             graphBSPTree = new ScreenTreeNode(0, width, height, 0, getGraphBSPPoints());
             graphBSPTree.recursiveSplit(1);
-            console.timeEnd('BSP tree');
+            //console.timeEnd('BSP tree');
     
             /*(function displayTree(node){
                 svg.insert("rect")
@@ -343,18 +344,23 @@
             latestMouseMoveEvent = e;
         });
     
+        // draws what it's asked for without thinking too much about it
         global.graphViz = {
-            addNodes: function(newNodes){
-                console.log('addNodes', newNodes.length)
-                Array.prototype.push.apply(nodes, newNodes); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
+            updateGraph: function(newNodes, newEdges){
+                console.log('updateGraph', newNodes.length, newEdges.length)
+
+                // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
+                Array.prototype.push.apply(nodes, newNodes);
+                Array.prototype.push.apply(links, newEdges);
+
                 restart();
             },
-            addEdges: function (newEdges){
-                console.log('addEdges', newEdges.length)
-                Array.prototype.push.apply(links, newEdges); // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
+            empty: () => {
+                throw 'TODO';
+                nodes = [];
+                links = [];
                 restart();
-            },
-            nodes: nodes
+            }
         };
     };
 

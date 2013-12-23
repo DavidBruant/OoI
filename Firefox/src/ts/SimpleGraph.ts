@@ -54,32 +54,66 @@ export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
     }
     
     toJSON(){
-        console.log('toJSON');
-        
         var nodes = [];
     
-        var getId = (() => {
+        var getIndex = (() => {
             var wm = new WeakMap<SimpleGraphNode, number>();
-            var nextId = 0;
     
             return n => {
-                var id = wm.get(n);
-                if(id === undefined){
-                    id = nextId++;
-                    nodes.push({id: id});
-                    wm.set(n, id);
+                var index = wm.get(n);
+                var serializableNode;
+    
+                if(index === undefined){
+                    index = nodes.length;
+                    serializableNode = {};
+
+                    if(n.callable)
+                        serializableNode.class = 'function';
+        
+                    if(n.root)
+                        serializableNode.class = 'root';
+        
+                    if(n.callee) // instanceof Debugger.Environment
+                        serializableNode.class = 'scope';
+    
+                    nodes[index] = serializableNode; // should result in dense array
+                    wm.set(n, index);
                 }
     
-                return id;
+                return index;
             };
         })();
     
         var edges = [];
         this.edges.forEach(e => {
-            edges.push({
-                from: getId(e.from),
-                to: getId(e.to)
-            });
+            var label;
+            var details = e.details;
+            
+            var serializedEdge = {
+                from: getIndex(e.from),
+                to: getIndex(e.to)
+            }
+    
+            // label
+            if(details.dataProperty)
+                serializedEdge.label = details.dataProperty;
+            if(details.getter)
+                serializedEdge.label = '[[Getter]] '+details.getter;
+            if(details.setter)
+                serializedEdge.label = '[[Setter]] '+details.setter;
+            if(details.variable)
+                serializedEdge.label = details.variable;
+
+            // class
+            if(details.variable)
+                serializedEdge.class = 'variable';
+            if(details.type === 'parent-scope')
+                serializedEdge.class = 'parent-scope';
+            if(details.type === 'lexical-scope')
+                serializedEdge.class = 'lexical-scope';
+
+            edges.push(serializedEdge);
+
         });
     
         var serializable = {
