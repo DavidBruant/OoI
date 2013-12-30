@@ -2,118 +2,104 @@
 
 "use strict";
 
-export class SimpleGraphNode implements GraphNode{
-
-}
-
-export class SimpleNodeSet implements GraphNodeSet<SimpleGraphNode>{
-
-    private set : Set<SimpleGraphNode>
-    private graph : Graph<SimpleGraphNode,  SimpleGraphEdge>
-
-    constructor () {
-        this.set = new Set();
-    }
-
-    add(n: SimpleGraphNode){
-        this.set.add(n);
-    }
-    has(n: SimpleGraphNode){
-        return this.set.has(n)
-    }
-    delete(/*n: SimpleGraphNode*/){
-        // TODO remove related edges
-        throw 'TODO';
-    }
-    get size(){
-        return this.set.size
-    }
-    values(){
-        return this.set.values();
-    }
+export class SimpleGraphNode implements GraphVertex{
+    
 }
 
 export class SimpleGraphEdge implements GraphEdge<SimpleGraphNode>{
-    from
-    to
-}
-
-export class SimpleEdgeSet implements GraphEdgeSet{
-
-    private set : Set<SimpleGraphEdge>
-    public graph: SimpleGraph
-
-    constructor(){
-        this.set = new Set();
-    }
-
-    add(e: SimpleGraphEdge){
-        // add nodes if not already in the graph
-        if(!this.graph.nodes.has(e.from))
-            this.graph.nodes.add(e.from);
-
-        if(!this.graph.nodes.has(e.to))
-            this.graph.nodes.add(e.to);
-
-        this.set.add(e);
-    }
-    has(e: SimpleGraphEdge){
-        return this.set.has(e);
-    }
-    delete(){
-
-    }
-    get size(){
-        return this.set.size
-    }
-    values(){
-        return this.set.values();
-    }
+    from: SimpleGraphNode
+    to: SimpleGraphNode
+    data: any
 }
 
 export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
-    nodes = <SimpleNodeSet> new Set();
-    edges = <SimpleEdgeSet> new Set();
+    nodes = new Set<SimpleGraphNode>();
+    edges = new Set<SimpleGraphEdge>();
 
     constructor(){
-        this.edges.graph = this;
+        //this.edges.graph = this;
     }
+    
+    toJSON(){
+        var rootIndices = [];
+        var nodes = [];
+    
+        var getIndex = (() => {
+            var wm = new WeakMap<SimpleGraphNode, number>();
+    
+            return n => {
+                var index = wm.get(n);
+                var serializableNode;
+    
+                if(index === undefined){
+                    index = nodes.length;
+                    serializableNode = {outgoingEdges: []}; // some memory waste here when it comes to data transfer
 
-    get nodeToEdges(){
-        var ret = new WeakMap();
-        var edgeIt = this.edges.values();
-        var e;
-        var from, to;
+                    // TODO move this to a more appropriate place
+                    if(n.callable)
+                        serializableNode.class = 'function';
+        
+                    if(n.root)
+                        serializableNode.class = 'root';
+        
+                    if(n.callee) // instanceof Debugger.Environment
+                        serializableNode.class = 'scope';
+    
+                    nodes[index] = serializableNode; // should result in dense array
+                    wm.set(n, index);
+                }
+    
+                return index;
+            };
+        })();
 
-        while(edgeIt){
-            try{
-                e = edgeIt.next();
-            }
-            catch(e){
-                if(e instanceof StopIteration)
-                    break;
-            }
+        // init nodes and indices with root nodes (as side-effect of getIndex)
+        this.roots.forEach( r => getIndex(r) );
+        rootIndices = [];
+        nodes.forEach( (root, i) => rootIndices.push(i) );
+    
+        this.edges.forEach(e => {
+            var label; 
+            var data = e.data;
+    
+            var serializedEdge = <any>{
+                to: getIndex(e.to)
+            };
+    
+            // TODO move this to a more appropriate place
+            // label
+            if(data.dataProperty)
+                serializedEdge.label = data.dataProperty;
+            if(data.getter)
+                serializedEdge.label = '[[Getter]] '+data.getter;
+            if(data.setter)
+                serializedEdge.label = '[[Setter]] '+data.setter;
+            if(data.variable)
+                serializedEdge.label = data.variable;
 
-            from = e.from;
-            to = e.to;
+            // class
+            if(data.variable)
+                serializedEdge.class = 'variable';
+            if(data.type === 'parent-scope')
+                serializedEdge.class = 'parent-scope';
+            if(data.type === 'lexical-scope')
+                serializedEdge.class = 'lexical-scope';
+            
+            var from = nodes[getIndex(e.from)]; // A WeakMap might be quicker than this 2-level indirection
+            from.outgoingEdges.push(serializedEdge);
+        });
+    
+        var serializable = {
+            rootIndices: rootIndices,
+            nodes: nodes
+        };
 
-            var edgeArray = ret.get(from);
-            if(!edgeArray){
-                edgeArray = [];
-                ret.set(from, edgeArray);
-            }
-            edgeArray.push(e);
-
-            edgeArray = ret.get(to);
-            if(!edgeArray){
-                edgeArray = [];
-                ret.set(to, edgeArray);
-            }
-            edgeArray.push(e);
-        }
-
-        return ret;
+        console.log('JSON.stringify(serializable).length', JSON.stringify(serializable).length);
+    
+        return serializable;
     }
+    
+    
 }
 
 

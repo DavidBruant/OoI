@@ -1,7 +1,7 @@
 // only used in the generic definition below
-interface GraphNodeInternal{}
+interface GraphVertexInternal{}
 
-interface GraphNode extends GraphNodeInternal{}
+interface GraphVertex extends GraphVertexInternal{}
 
 // only used in the generic definition below
 interface GraphEdgeInternal<N>{}
@@ -11,15 +11,9 @@ interface GraphEdge<N> extends GraphEdgeInternal<N>{
     to: N;
 }
 
-interface GraphNodeSet<N extends GraphNodeInternal> extends SetI<N>{
-    add(n: N) : void
-
-}
-interface GraphEdgeSet<E extends GraphEdgeInternal<GraphNodeInternal>> extends SetI<E>{}
-
-interface Graph<N extends GraphNodeInternal, E extends GraphEdgeInternal<N>>{
+interface Graph<N extends GraphVertexInternal, E extends GraphEdgeInternal<N>>{
     // whether these are getters (copy or proxy the to actual set) or the actual set is up to the implementation
-    nodes: GraphNodeSet<N>
-    edges: GraphEdgeSet<E>
+    nodes?: Set<N>
+    edges?: Set<E>
+    roots? : Set<N>
 }
-

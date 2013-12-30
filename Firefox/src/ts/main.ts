@@ -9,13 +9,17 @@
 import self = require("self");
 var data = self.data;
 
+import system = require("sdk/system");
+var staticArgs = system.staticArgs;
+
 import chr = require("chrome");
 var Cu = chr.Cu;
 
 import getObjectCreationsLocations = require('getObjectCreationsLocations');
 
-import ooiPanelBuild = require('ooiPanelBuild')
+import ooiPanelBuild = require('ooiPanelBuild');
 
+import prefs = require('sdk/preferences/service');
 
 // For whatever reason, there is no console available in this addon (wtf!)
 /*var console = {
@@ -35,13 +39,19 @@ var gDevTools = devtools.gDevTools;
 
 
 export function main(){
-
+    
+    if(staticArgs['browser-toolbox']){
+        // enable browser toolbox https://developer.mozilla.org/en-US/docs/Tools/Browser_Toolbox
+        prefs.set("devtools.chrome.enabled", true);
+        prefs.set("devtools.debugger.remote-enabled", true);
+    }
+  
     // TODO figure out if there is a way to unregister a tool
     gDevTools.registerTool( {
         id: 'OoI',
         icon: "chrome://browser/skin/devtools/tool-inspector.png",
         // https://github.com/mozilla/mozilla-central/blob/1886faa9e2f7ccede29d0f5696a423997322978b/browser/devtools/framework/toolbox.js#L473
-        url: data.url("OoIpanel.html"),
+        url: data.url("devtool-panel.html"),
         label: "Object of Interest",
         isTargetSupported: function(target){
             return true; // TODO figure out what's up here

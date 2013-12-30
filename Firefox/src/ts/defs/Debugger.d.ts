@@ -18,6 +18,8 @@ declare module Debugger{
         getOwnPropertyNames() : string[]
         getOwnPropertyDescriptor(name: string): PropertyDescriptor
         proto: Debugger.Object
+        
+        callable: boolean
 
         // custom
         root : boolean
