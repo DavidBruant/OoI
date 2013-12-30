@@ -3,12 +3,13 @@
 "use strict";
 
 export class SimpleGraphNode implements GraphVertex{
-
+    
 }
 
 export class SimpleGraphEdge implements GraphEdge<SimpleGraphNode>{
     from: SimpleGraphNode
     to: SimpleGraphNode
+    data: any
 }
 
 export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
@@ -18,42 +19,9 @@ export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
     constructor(){
         //this.edges.graph = this;
     }
-
-    get nodeToEdges(){
-        var ret = new WeakMap<SimpleGraphNode, SimpleGraphEdge[]>();
-        var edgeIt = this.edges.values();
-        var e;
-        var from, to;
-
-        while(true){ // TODO for..of
-            var next = edgeIt.next();
-            if(next.done)
-                break;
-            
-            e = next.value;
-
-            from = e.from;
-            to = e.to;
-
-            var edgeArray = ret.get(from);
-            if(!edgeArray){
-                edgeArray = [];
-                ret.set(from, edgeArray);
-            }
-            edgeArray.push(e);
-
-            edgeArray = ret.get(to);
-            if(!edgeArray){
-                edgeArray = [];
-                ret.set(to, edgeArray);
-            }
-            edgeArray.push(e);
-        }
-
-        return ret;
-    }
     
     toJSON(){
+        var rootIndices = [];
         var nodes = [];
     
         var getIndex = (() => {
@@ -65,8 +33,9 @@ export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
     
                 if(index === undefined){
                     index = nodes.length;
-                    serializableNode = {};
+                    serializableNode = {outgoingEdges: []}; // some memory waste here when it comes to data transfer
 
+                    // TODO move this to a more appropriate place
                     if(n.callable)
                         serializableNode.class = 'function';
         
@@ -83,42 +52,46 @@ export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
                 return index;
             };
         })();
+
+        // init nodes and indices with root nodes (as side-effect of getIndex)
+        this.roots.forEach( r => getIndex(r) );
+        rootIndices = [];
+        nodes.forEach( (root, i) => rootIndices.push(i) );
     
-        var edges = [];
         this.edges.forEach(e => {
-            var label;
-            var details = e.details;
-            
-            var serializedEdge = {
-                from: getIndex(e.from),
-                to: getIndex(e.to)
-            }
+            var label; 
+            var data = e.data;
     
+            var serializedEdge = <any>{
+                to: getIndex(e.to)
+            };
+    
+            // TODO move this to a more appropriate place
             // label
-            if(details.dataProperty)
-                serializedEdge.label = details.dataProperty;
-            if(details.getter)
-                serializedEdge.label = '[[Getter]] '+details.getter;
-            if(details.setter)
-                serializedEdge.label = '[[Setter]] '+details.setter;
-            if(details.variable)
-                serializedEdge.label = details.variable;
+            if(data.dataProperty)
+                serializedEdge.label = data.dataProperty;
+            if(data.getter)
+                serializedEdge.label = '[[Getter]] '+data.getter;
+            if(data.setter)
+                serializedEdge.label = '[[Setter]] '+data.setter;
+            if(data.variable)
+                serializedEdge.label = data.variable;
 
             // class
-            if(details.variable)
+            if(data.variable)
                 serializedEdge.class = 'variable';
-            if(details.type === 'parent-scope')
+            if(data.type === 'parent-scope')
                 serializedEdge.class = 'parent-scope';
-            if(details.type === 'lexical-scope')
+            if(data.type === 'lexical-scope')
                 serializedEdge.class = 'lexical-scope';
-
-            edges.push(serializedEdge);
-
+            
+            var from = nodes[getIndex(e.from)]; // A WeakMap might be quicker than this 2-level indirection
+            from.outgoingEdges.push(serializedEdge);
         });
     
         var serializable = {
-            nodes: nodes,
-            edges: edges
+            rootIndices: rootIndices,
+            nodes: nodes
         };
 
         console.log('JSON.stringify(serializable).length', JSON.stringify(serializable).length);

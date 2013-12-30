@@ -100,6 +100,7 @@ function build(iframeWindow, toolbox){
             var relatedPreScriptGraph = globalToPreScriptGraph.get(targetGlobal);
             
             var differenceGraph = new SimpleGraph();
+            differenceGraph.roots = relatedPreScriptGraph.roots;
             
             var clickGraphNodesIt = clickGraph.nodes.values();
             while(true){

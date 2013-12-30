@@ -72,7 +72,7 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
     todo.add(windowProxyDebuggeeObject);
 
     //console.log('number of own global props', globalDebugObject.getOwnPropertyNames().length);
-
+    graph.roots = new Set([windowProxyDebuggeeObject]); 
 
     var debuggeeObjectPrototype = windowProxyDebuggeeObject.byPath('Object.prototype');
     //console.log('debuggeeObjectPrototype props', debuggeeObjectPrototype.getOwnPropertyNames());
@@ -131,7 +131,7 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
                             details.defaultPrototype = true;
                         }
 
-                        graph.edges.add({from: inspectedObj, to:value, details:details});
+                        graph.edges.add({from: inspectedObj, to:value, data:details});
 
                         if(!done.has(value)){
                             todo.add(value);
@@ -143,7 +143,7 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
                         // accessor
                         var get = desc.get;
                         if(get instanceof Debugger.Object){
-                            graph.edges.add({from: inspectedObj, to:get, details:{getter: p}});
+                            graph.edges.add({from: inspectedObj, to:get, data:{getter: p}});
 
                             if(!done.has(get)){
                                 todo.add(get);
@@ -151,7 +151,7 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
                         }
                         var set = desc.set;
                         if(set instanceof Debugger.Object){
-                            graph.edges.add({from: inspectedObj, to:set, details:{setter: p}});
+                            graph.edges.add({from: inspectedObj, to:set, data:{setter: p}});
 
                             if(!done.has(set)){
                                 todo.add(set);
@@ -169,7 +169,7 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
                 // lexical scope for a function
                 var environment = inspectedObj.environment;
                 if(environment instanceof Debugger.Environment){
-                    graph.edges.add({from: inspectedObj, to:environment, details:{type: "lexical-scope"}});
+                    graph.edges.add({from: inspectedObj, to:environment, data:{type: "lexical-scope"}});
 
                     if(!done.has(environment)){ // probably useless test TODO investigate
                         todo.add(environment);
@@ -183,7 +183,7 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
                 
                 var parent = inspectedEnv.parent;
                 if(parent instanceof Debugger.Environment){
-                    graph.edges.add({from: inspectedEnv, to:parent, details:{type: "parent-scope"}});
+                    graph.edges.add({from: inspectedEnv, to:parent, data:{type: "parent-scope"}});
                     if(!done.has(parent)){
                         todo.add(parent);
                     }
@@ -206,7 +206,7 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
                     if(value instanceof Debugger.Object){
                         var details = {variable: v};
 
-                        graph.edges.add({from: inspectedEnv, to:value, details:details});
+                        graph.edges.add({from: inspectedEnv, to:value, data:details});
 
                         if(!done.has(value)){
                             todo.add(value);

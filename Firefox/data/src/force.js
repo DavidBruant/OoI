@@ -41,8 +41,17 @@
     
                 for(var i=todoNode ; i < goal ; i++){
                     n = node[0][i];
-                    n.setAttribute('cx', n.__data__.x);
-                    n.setAttribute('cy', n.__data__.y);
+                    //console.log('n', n.__data__);
+                    var circle = n.querySelector('circle');
+    
+                    circle.setAttribute('cx', n.__data__.x);
+                    circle.setAttribute('cy', n.__data__.y);
+    
+                    var text = n.querySelector('text');
+                    if(text){
+                        text.setAttribute('x', n.__data__.x);
+                        text.setAttribute('y', n.__data__.y);
+                    }
                 }
     
                 todoNode = goal;
@@ -67,7 +76,6 @@
             }
     
             function moveSome(){
-                //console.time('moveSome')
                 if(todoNode < node[0].length) // some more nodes to do
                     moveSomeNodes()
                 else{ // nodes are done
@@ -87,6 +95,7 @@
     
     
             return function moveItems(){
+                //console.log('moveItems');
                 if(!restart){
                     restart = true;
                     requestAnimationFrame(moveSome);
@@ -98,6 +107,7 @@
         var ticks = []
     
         function tick() {
+            //console.log('tick');
             ticks.push(performance.now());
             moveItems();
     
@@ -117,25 +127,64 @@
     
             link = link.data(links);
             // directed graph http://bl.ocks.org/rkirsling/5001347
-    
-            link.enter().insert("line", ".node")
-                .attr("class", e => e.class? "link "+ e.class : "link")
-                .attr("stroke-width", 2)
-                .attr('title', e => e.label);
+            
+            link.enter().insert("line")
+                    .attr("class", e => {
+                        return e.class? "link "+ e.class : "link";
+                    })
+                    .attr("stroke-width", 2)
+                    .attr('title', e => {
+                        return e.label
+                    });
+                
+                
+            /*catch(e){
+                console.log('link.enter.insert error', String(e), e.stack, String(e.stack));
+            }*/
+            
     
             node = node.data(nodes);
     
-            node.enter().insert("circle", ".cursor")
-                .attr("class", n => n.class? "node "+ n.class : "node")
-                .attr("r", 5)
-                .call(force.drag);
+            var nodeEnterG = node.enter().insert("g");
+
+            nodeEnterG.on('click', e => {
+                console.log('node click', e);
+                graphViz.expand(e);
+                //d3.event.sourceEvent.target
+            });
+
+            nodeEnterG.append("circle")
+                .attr("class", n => {
+                    var ret = ["node"];
+                    if(n.class)
+                        ret.push(n.class);
+                    if(n.expanded)
+                        ret.push('expanded');
+                    return ret.join(' ')
+                })
+                .attr("r", n => Array.isArray(n.dataNode.outgoingEdges) && !n.expanded ?
+                                    7 + Math.sqrt(n.dataNode.outgoingEdges.length)/5 :
+                                    5
+                )
+            
+            //throw Error('add click handler and react to the marker saying whether the node is expanded');
+    
+            nodeEnterG.filter(n => {
+                    return Array.isArray(n.dataNode.outgoingEdges) && !n.expanded;
+                })
+                .append('text')
+                .attr('x', n => n.x)
+                .attr('y', n => n.y)
+                .attr("text-anchor", "middle")
+                .text(n => {
+                    return String(n.dataNode.outgoingEdges.length)
+                }); 
+
     
             force.start();
             for (var i = 4; i > 0; --i)
                 force.tick(); // do a couple iterations to begin with
         }
-    
-        //document.addEventListener('DOMContentLoaded', e => {
     
         var svg = d3.select("body").append("svg")
             .attr("width", width)
@@ -302,12 +351,14 @@
             }
         }
     
-        document.body.addEventListener('click', playPauseToggle);
+        svg.on('click', playPauseToggle);
     
     
         force.on('end', function(){
-            console.log('ticks', ticks);
+            //console.log('ticks', ticks);
     
+            //console.log('svg', document.querySelector('svg').outerHTML);
+            
             //console.time('BSP tree');
             // nodes + edges
             graphBSPTree = new ScreenTreeNode(0, width, height, 0, getGraphBSPPoints());
@@ -338,7 +389,7 @@
             latestMouseMoveEvent = undefined;
         }
     
-        document.body.addEventListener('mousemove', function(e){
+        document.querySelector('svg').addEventListener('mousemove', function(e){
             if(!latestMouseMoveEvent) // otherwise, it's already scheduled
                 requestAnimationFrame(nextFrame);
             latestMouseMoveEvent = e;
@@ -347,12 +398,12 @@
         // draws what it's asked for without thinking too much about it
         global.graphViz = {
             updateGraph: function(newNodes, newEdges){
-                console.log('updateGraph', newNodes.length, newEdges.length)
+                console.log('updateGraph', newNodes, newEdges)
 
                 // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
                 Array.prototype.push.apply(nodes, newNodes);
                 Array.prototype.push.apply(links, newEdges);
-
+    
                 restart();
             },
             empty: () => {
@@ -362,6 +413,7 @@
                 restart();
             }
         };
+
     };
 
     if(document.readyState !== "complete")
@@ -382,14 +434,3 @@
 
 
  */
-
-
-
-
-
-
-
-
-
-
-

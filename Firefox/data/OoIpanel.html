@@ -9,25 +9,37 @@
                 pointer-events: all;
             }
             
-            .node {
-                fill: #000;
+            g.node{
+                cursor: pointer;
             }
             
-            .node.root{
+            circle.node {
+                fill: #000;
+                stroke: white;
+                stroke-width: 2px;
+                z-index: 2;
+            }
+            
+            circle.node.expanded{
+                stroke-width: 0;
+            }
+            
+            circle.node.root{
                 fill: deepskyblue;
             }
             
-            .node.function{
+            circle.node.function{
                 fill: indianred;
             }
             
-            .node.scope{
+            circle.node.scope{
                 fill: #4b802a;
             }
             
             
             .link {
                 stroke: #aaaaaa;
+                z-index: 1;
             }
             
             .link.variable{

@@ -15,4 +15,5 @@ interface Graph<N extends GraphVertexInternal, E extends GraphEdgeInternal<N>>{
     // whether these are getters (copy or proxy the to actual set) or the actual set is up to the implementation
     nodes?: Set<N>
     edges?: Set<E>
+    roots? : Set<N>
 }
