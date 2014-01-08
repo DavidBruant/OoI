@@ -2,20 +2,14 @@
 
 "use strict";
 
-export class SimpleGraphNode implements GraphVertex{
-    
-}
 
-export class SimpleGraphEdge implements GraphEdge<SimpleGraphNode>{
-    from: SimpleGraphNode
-    to: SimpleGraphNode
-    data: any
-}
 
-export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
+class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
     nodes = new Set<SimpleGraphNode>();
     edges = new Set<SimpleGraphEdge>();
 
+    public roots : Set<SimpleGraphNode>
+    
     constructor(){
         //this.edges.graph = this;
     }
@@ -102,4 +96,4 @@ export class SimpleGraph implements Graph<SimpleGraphNode, SimpleGraphEdge>{
     
 }
 
-
+export = SimpleGraph;

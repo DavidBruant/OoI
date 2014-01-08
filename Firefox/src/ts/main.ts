@@ -40,11 +40,21 @@ var gDevTools = devtools.gDevTools;
 
 export function main(){
     
+    // enable browser toolbox https://developer.mozilla.org/en-US/docs/Tools/Browser_Toolbox
     if(staticArgs['browser-toolbox']){
-        // enable browser toolbox https://developer.mozilla.org/en-US/docs/Tools/Browser_Toolbox
         prefs.set("devtools.chrome.enabled", true);
         prefs.set("devtools.debugger.remote-enabled", true);
     }
+    
+    // make chrome code faster 
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=907201
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=929374
+    // https://bugzilla.mozilla.org/attachment.cgi?id=820210&action=diff
+    if(staticArgs['faster-chrome']){
+        prefs.set("javascript.options.ion.chrome", true);
+        prefs.set("javascript.options.typeinference.chrome", true);
+    } 
+    
   
     // TODO figure out if there is a way to unregister a tool
     gDevTools.registerTool( {

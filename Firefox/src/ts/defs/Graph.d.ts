@@ -17,3 +17,14 @@ interface Graph<N extends GraphVertexInternal, E extends GraphEdgeInternal<N>>{
     edges?: Set<E>
     roots? : Set<N>
 }
+
+    
+interface SimpleGraphNode extends GraphVertex{
+    
+}
+
+interface SimpleGraphEdge extends GraphEdge<SimpleGraphNode>{
+    from: SimpleGraphNode
+    to: SimpleGraphNode
+    data: any
+}

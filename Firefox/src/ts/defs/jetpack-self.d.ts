@@ -3,6 +3,6 @@ declare module "self" {
 }
 
 interface SelfData{
-    url(id: string)
+    url(id: string) : string
     load(id: string)
 }

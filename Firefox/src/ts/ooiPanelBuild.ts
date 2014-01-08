@@ -12,8 +12,7 @@ import traverseGraph = require('traverseGraph')
 import getSDKTabContentWindow = require('getSDKTabContentWindow');
 import sdkTabToXulTab = require('sdkTabToXulTab');
 import isDevToolsOpen = require('devToolsOpen');
-import SimpleGraphM = require('SimpleGraph')
-var SimpleGraph = SimpleGraphM.SimpleGraph;
+import SimpleGraph = require('SimpleGraph')
 
 import events = require("sdk/system/events");
 
@@ -36,7 +35,7 @@ import workers = require("sdk/content/worker");
 // possibility to expand)
 
 
-var globalToPreScriptGraph = new WeakMap();
+var globalToPreScriptGraph = new WeakMap<ContentWindow, SimpleGraph>();
 
 // Create a graph at the entrance of each global
 events.on("content-document-global-created", e => {

@@ -1,6 +1,11 @@
 interface Set<T> {
     values() : Iterator<T>
 }
+    
+declare var Set: {
+    new <T>(initArray? : T[]): Set<T>;
+}
+
 
 interface Iteration<V>{
     value: V
