@@ -18,7 +18,7 @@
             .nodes([])
             .linkDistance(30)
             .charge(-60)
-            .on("tick", tick);
+            .on("tick", tick);  
     
         var nodes = force.nodes(),
             links = force.links();
@@ -106,18 +106,40 @@
     
         var ticks = []
     
+        var ORIGINAL_LINE_SIZE = 100;
+    
         function tick() {
-            //console.log('tick');
+            console.log('tick');
             ticks.push(performance.now());
-            moveItems();
+            //moveItems();
     
-            /*link.attr("x1", function(d) { return d.source.x; })
-             .attr("y1", function(d) { return d.source.y; })
-             .attr("x2", function(d) { return d.target.x; })
-             .attr("y2", function(d) { return d.target.y; });
+            node.style("transform", d => 'translate('+d.x+'px, '+d.y+'px)');
     
-             node.attr("cx", function(d) { return d.x; })
-             .attr("cy", function(d) { return d.y; });*/
+            link.style("transform", d => {
+                var transforms = [];
+    
+                var newX1 = d.source.x;
+                var newX2 = d.target.x;
+                var newY1 = d.source.y;
+                var newY2 = d.target.y;
+            
+                var translateX = (newX1 + newX2)/2;
+                var translateY = (newY1 + newY2)/2;
+            
+                transforms.push('translate('+translateX+'px, '+translateY+'px)');
+            
+                var angle = 90+Math.atan2(newY2-newY1, newX2-newX1)*180/Math.PI;
+            
+                transforms.push('rotate('+angle+'deg)');
+                    
+                return transforms.join(' ');
+            } )
+            .attr('y1', d => -Math.hypot(d.source.x - d.target.x, d.source.y - d.target.y)/2 )
+            .attr('y2', d => Math.hypot(d.source.x - d.target.x, d.source.y - d.target.y)/2 );
+    
+            console.log('end tick')
+    
+            
     
             // things moved, invalidating tree
             graphBSPTree = undefined;
@@ -135,7 +157,11 @@
                     .attr("stroke-width", 2)
                     .attr('title', e => {
                         return e.label
-                    });
+                    })
+                    .attr("x1", 0)
+                    .attr("x2", 0)
+                    .attr("y1", -ORIGINAL_LINE_SIZE/2)
+                    .attr("y2", ORIGINAL_LINE_SIZE/2);
                 
                 
             /*catch(e){
@@ -166,6 +192,8 @@
                                     7 + Math.sqrt(n.dataNode.outgoingEdges.length)/5 :
                                     5
                 )
+                .attr("cx", 0)
+                .attr("cy", 0)
             
             //throw Error('add click handler and react to the marker saying whether the node is expanded');
     
@@ -184,6 +212,7 @@
             force.start();
             for (var i = 4; i > 0; --i)
                 force.tick(); // do a couple iterations to begin with
+            
         }
     
         var svg = d3.select("body").append("svg")
@@ -355,8 +384,8 @@
     
     
         force.on('end', function(){
-            //console.log('ticks', ticks);
-    
+            console.log('ticks', ticks);
+            
             //console.log('svg', document.querySelector('svg').outerHTML);
             
             //console.time('BSP tree');
