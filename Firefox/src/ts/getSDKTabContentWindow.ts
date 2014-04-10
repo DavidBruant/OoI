@@ -1,7 +1,7 @@
 "use strict";
 
 import sdkTabToXulTab = require('sdkTabToXulTab');
-import utils = require("tabs/utils");
+import utils = require("sdk/tabs/utils");
 var getTabContentWindow = utils.getTabContentWindow;
 
 

@@ -6,7 +6,7 @@
 "use strict";
 
 
-import self = require("self");
+import self = require("sdk/self");
 var data = self.data;
 
 import system = require("sdk/system");

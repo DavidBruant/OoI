@@ -32,7 +32,7 @@
     
         //graphViz.empty();
         // Full graph. Replace the existing one on screen
-        var MAX_INITIAL_GRAPH_NODES = 400;
+        var MAX_INITIAL_GRAPH_NODES = 300;
         var MAX_OUTGOING_EDGES = 25;
         
         // data nodes sets

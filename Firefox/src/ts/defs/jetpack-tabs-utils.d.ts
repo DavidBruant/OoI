@@ -1,4 +1,4 @@
-declare module "tabs/utils" {
+declare module "sdk/tabs/utils" {
     export function getTabs() : XulTab[]
     export function getTabId(tab : XulTab) : number
     export function getTabContentWindow(tab: XulTab) : ContentWindow

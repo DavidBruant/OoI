@@ -5,9 +5,7 @@
 import jetpackPromise = require('sdk/core/promise');
 import chrome = require('chrome')
 
-var Cu = chrome.Cu;
-
-var EventEmitter = Cu.import("resource:///modules/devtools/shared/event-emitter.js", {}).EventEmitter;
+var EventTarget = require('sdk/event/target').EventTarget;
 
 var defer = jetpackPromise.defer;
 
@@ -16,7 +14,7 @@ class OoIPanel /* +should implements JetPackEventTarget*/{
         public panelWin : HTMLIFrameElement,
         public _toolbox : DevToolsToolbox)
     {
-        EventEmitter.decorate(this);
+        EventTarget.call(this);
     }
 
     get target() { return this._toolbox.target; }

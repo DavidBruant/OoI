@@ -1,10 +1,10 @@
 "use strict";
 
-import tabs = require('tabs');
-import self = require("self");
+import tabs = require('sdk/tabs');
+import self = require("sdk/self");
 var data = self.data;
 
-import utils = require("tabs/utils");
+import utils = require("sdk/tabs/utils");
 var getXULTabContentWindow = utils.getTabContentWindow;
 
 import OoIPanel = require('OoIPanel');

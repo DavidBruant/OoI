@@ -2,7 +2,7 @@
 
 "use strict";
 
-import tabsUtils = require('tabs/utils');
+import tabsUtils = require('sdk/tabs/utils');
 var getTabs = tabsUtils.getTabs;
 var getTabId = tabsUtils.getTabId;
 
