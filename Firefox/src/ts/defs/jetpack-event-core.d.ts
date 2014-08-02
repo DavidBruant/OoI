@@ -1,8 +1,8 @@
-/*declare module "sdk/event/target"{
+declare module "sdk/event/target"{
     export class EventTarget{
 
     }
-}*/
+}
 
 
 interface JetPackEventTarget{

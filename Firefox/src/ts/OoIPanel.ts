@@ -5,8 +5,9 @@
 import jetpackPromise = require('sdk/core/promise');
 import chrome = require('chrome')
 
-var EventTarget = require('sdk/event/target').EventTarget;
+import EventTargetModule = require('sdk/event/target');
 
+var EventTarget = EventTargetModule.EventTarget
 var defer = jetpackPromise.defer;
 
 class OoIPanel /* +should implements JetPackEventTarget*/{
