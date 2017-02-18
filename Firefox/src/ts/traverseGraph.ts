@@ -212,10 +212,9 @@ function traverseGraph(window: ContentWindow, graph: Graph<GraphVertex, GraphEdg
                             todo.add(value);
                         }
                     }
-                })
+                });
 
             }
-
 
         }
 

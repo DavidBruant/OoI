@@ -93,6 +93,7 @@ function build(iframeWindow, toolbox){
             var clickGraph = new SimpleGraph();
             traverseGraph(targetGlobal, clickGraph);
             console.timeEnd('clickGraph');
+        
             console.log('click graph', clickGraph.nodes.size, clickGraph.edges.size);
             
             //console.time('differenceGraph');

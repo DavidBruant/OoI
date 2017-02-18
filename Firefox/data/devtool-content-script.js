@@ -138,6 +138,7 @@
     })
     
     document.querySelector('button').addEventListener('click', e => {
+        throw new Error('Add a wait screen');
         self.port.emit('clickGraph', 'yo');
     });
     
