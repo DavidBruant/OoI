@@ -73,7 +73,7 @@ var OoiPanel = Class({
         // and sending messages.
 
         [
-            "devtool-content-script.js"
+            "dirty.js"
         ]
         .map( path => data.url(path) )
         .forEach(url => messageManager.loadFrameScript(url, false))

@@ -5,6 +5,14 @@
 
 "use strict";
 
+/*`TODO : 
+* Add an element from content script // easy
+* See whether d3 can be used from HTML document or whether it has to be loaded as content script // nope, communication via events
+* Build a graph from debuggee
+    * There is a change here. Debugger API should be available for content script
+* receive a graph in content script
+`*/
+
 
 import self = require("sdk/self");
 var data = self.data;

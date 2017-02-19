@@ -66,6 +66,18 @@
         <script defer src="src/2DBSP.js"> </script>
         <script defer src="src/force.js"> </script>
         <script defer src="src/svgpan.js"> </script>
+        <script>
+            "use strict";
+            document.addEventListener('DOMContentLoaded', e => {
+                force(this)
+                svgpan()
+            });
+
+            window.addEventListener('message', e => {
+                console.log('message from content script', e.type, e)
+            });
+
+        </script>
     </head>
     
     <body>

@@ -7,6 +7,9 @@
 
     console.log('devtool-content-script');
 
+    console.log('traverseGraph', typeof traverseGraph);
+    console.log('simpleGraph', typeof simpleGraph);
+
 
 
     // TODO document expected format... in TypeScript I guess?
@@ -144,11 +147,24 @@
 
 })();
 
+function forwardMessageToContent(message) {
+  const { type, data, origin, bubbles, cancelable } = message.data;
+
+  const event = new window.MessageEvent(type, {
+    bubbles: bubbles,
+    cancelable: cancelable,
+    data: data,
+    origin: origin,
+    target: window,
+    source: window,
+  });
+
+  window.dispatchEvent(event);
+};
 
 (function ({content, addMessageListener, sendAsyncMessage, removeMessageListener}) {
 
-    console.log('content', content);
-    console.log('content.document', content.document);
+    const document = content.document;
 
     /**
      * Listener for message from the inspector panel (chrome scope).
@@ -185,5 +201,20 @@
     content.addEventListener("click", event => {
         postChromeMessage("click", "Hello from content scope!");
     })
+
+    document.querySelector('button').addEventListener('click', e => {
+        console.log('button', 'yo');
+    });
+
+    document.body.append('COUCOU !');
+
+    // TODO send message to content. https://github.com/firebug/pixel-perfect/blob/master/data/popup-frame-script.js
+
+    console.time('preScriptGraph');
+    var preScriptGraph = new SimpleGraph();
+    traverseGraph(content, preScriptGraph);
+    console.timeEnd('preScriptGraph');
+
+
 
 })(this);
