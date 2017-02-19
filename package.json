@@ -3,6 +3,10 @@
     "fullName": "Object of Interest",
     "description": "An add-on to find memory leaks",
     "author": "David Bruant",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
     "dependencies": {
 
     },

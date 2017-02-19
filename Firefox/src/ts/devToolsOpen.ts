@@ -4,7 +4,7 @@ import chr = require("chrome");
 
 var Cu = chr.Cu;
 
-var devtoolsExport = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
+var devtoolsExport = Cu.import("resource://devtools/client/framework/gDevTools.jsm", {});
 var TargetFactory = devtoolsExport.devtools.TargetFactory;
 
 //console.log('devtoolsExp', Object.getOwnPropertyNames(devtoolsExp))

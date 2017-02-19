@@ -69,8 +69,6 @@ function build(iframeWindow, toolbox){
     var targetGlobal = getXULTabContentWindow(tab);
     var worker;
     
-    console.log('build');
-    
     var panelElement = iframeWindow.document.querySelector("iframe");
         
     panelElement.addEventListener('load', e => {
@@ -135,8 +133,9 @@ function build(iframeWindow, toolbox){
             worker.port.emit("graph", differenceGraph);
             
         });
+
     }, true); // super important "true"... no idea why...
-    
+
     panelElement.setAttribute('src', data.url("OoIpanel.html"));
 
     return panel.open();

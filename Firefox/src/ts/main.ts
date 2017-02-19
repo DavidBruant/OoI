@@ -17,7 +17,7 @@ var Cu = chr.Cu;
 
 import getObjectCreationsLocations = require('getObjectCreationsLocations');
 
-import ooiPanelBuild = require('ooiPanelBuild');
+import OoIPanel = require('OoIPanel');
 
 import prefs = require('sdk/preferences/service');
 
@@ -34,11 +34,20 @@ import prefs = require('sdk/preferences/service');
 
 //console.log('typeof Debugger', typeof Debugger)
 
-var devtools = Cu.import("resource:///modules/devtools/gDevTools.jsm");
-var gDevTools = devtools.gDevTools;
+var devtoolsExport = Cu.import("resource://devtools/client/framework/gDevTools.jsm", {});
+var gDevTools = devtoolsExport.gDevTools;
 
 
-export function main(){
+var devtoolsHooksExport = require("./devtoolsHooks.js");
+var devtoolsHooks = devtoolsHooksExport.hooks;
+
+/**
+ * Application entry point. Read MDN to learn more about Add-on SDK:
+ * https://developer.mozilla.org/en-US/Add-ons/SDK
+ */
+
+
+export function main(options, callbacks){
     
     // enable browser toolbox https://developer.mozilla.org/en-US/docs/Tools/Browser_Toolbox
     if(staticArgs['browser-toolbox']){
@@ -54,10 +63,11 @@ export function main(){
         prefs.set("javascript.options.ion.chrome", true);
         prefs.set("javascript.options.typeinference.chrome", true);
     } 
+
+    devtoolsHooks.initialize(options);
     
-  
     // TODO figure out if there is a way to unregister a tool
-    gDevTools.registerTool( {
+    /*gDevTools.registerTool( {
         id: 'OoI',
         icon: "chrome://browser/skin/devtools/tool-inspector.png",
         // https://github.com/mozilla/mozilla-central/blob/1886faa9e2f7ccede29d0f5696a423997322978b/browser/devtools/framework/toolbox.js#L473
@@ -67,55 +77,14 @@ export function main(){
             return true; // TODO figure out what's up here
         },
         build: ooiPanelBuild
-    });
-
-
-
-
-
-
-
-
-    /*
-
-    tabs.on('ready', function(tab) {
-
-        if(devToolsOpen(sdkTabToXulTab(tab))){
-            //console.log('OoI is on'); // TODO Move this warning to the DevTool console
-
-            var win = getSDKTabContentWindow(tab);
-            var dbg = new Debugger(win);
-
-
-
-            var scripts = dbg.findScripts();
-            //console.log('scripts.length', scripts.length);
-            console.log('script keys', Object.getOwnPropertyNames(Debugger.Script.prototype))
-            scripts.forEach(function(s){
-                if(s.implementsurl === null)
-                    return; // why does that happens sometimes?
-
-                var source = s.source;
-                var sourceText = source.text;
-
-
-                console.log('decompiled source for', s.url, '\n', sourceText);
-
-                var res = getObjectCreationsLocations(sourceText);
-                console.log('object creations sources', res);
-
-                console.log('all script offsets', JSON.stringify(s.getAllOffsets(), null, 3));
-
-                console.log('all script children offsets', s.getChildScripts().length);
-
-            });
-
-
-
-        }
-
     });*/
-
 
     console.log('OoI addon loaded without error');
 }
+
+function onUnload(reason) {
+  devtoolsHooks.shutdown(reason);
+}
+
+// Exports from this module
+exports.onUnload = onUnload;
