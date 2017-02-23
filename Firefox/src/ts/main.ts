@@ -14,6 +14,24 @@
 `*/
 
 
+throw `TODO
+When the ooi panel actually opens, send the tab frame content script
+
+this.panelFrame = viewFor(this);
+https://github.com/mozilla/gecko-dev/blob/master/addon-sdk/source/lib/sdk/view/core.js#L18
+
+// Get frame's message manager. Read more about message managers on MDN:
+// https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox/The_message_manager
+var messageManager = this.panelFrame.frameLoader.messageManager;
+
+Hook on  gDevTools.on("toolbox-created", x => x); to get the "target" (toolbox._target)
+(earliest event)
+
+When message comes from toolbox, get its corresponding target (WeakMap get), send message to corresponding frame script
+
+
+`
+
 import self = require("sdk/self");
 var data = self.data;
 
@@ -96,3 +114,5 @@ function onUnload(reason) {
 
 // Exports from this module
 exports.onUnload = onUnload;
+
+

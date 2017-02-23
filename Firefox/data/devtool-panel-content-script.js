@@ -210,6 +210,8 @@ function forwardMessageToContent(message) {
 
     // TODO send message to content. https://github.com/firebug/pixel-perfect/blob/master/data/popup-frame-script.js
 
+    throw 'TODO : this should only be a pass-through between the addon and the ooi panel';
+
     console.time('preScriptGraph');
     var preScriptGraph = new SimpleGraph();
     traverseGraph(content, preScriptGraph);
@@ -218,3 +220,4 @@ function forwardMessageToContent(message) {
 
 
 })(this);
+
