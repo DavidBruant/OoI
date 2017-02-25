@@ -14,7 +14,7 @@
 `*/
 
 
-throw `TODO
+/*throw `TODO
 When the ooi panel actually opens, send the tab frame content script
 
 this.panelFrame = viewFor(this);
@@ -28,9 +28,7 @@ Hook on  gDevTools.on("toolbox-created", x => x); to get the "target" (toolbox._
 (earliest event)
 
 When message comes from toolbox, get its corresponding target (WeakMap get), send message to corresponding frame script
-
-
-`
+`*/
 
 import self = require("sdk/self");
 var data = self.data;
@@ -41,9 +39,9 @@ var staticArgs = system.staticArgs;
 import chr = require("chrome");
 var Cu = chr.Cu;
 
-import getObjectCreationsLocations = require('getObjectCreationsLocations');
+import getObjectCreationsLocations = require('./getObjectCreationsLocations');
 
-import OoIPanel = require('OoIPanel');
+import OoIPanel = require('./OoIPanel');
 
 import prefs = require('sdk/preferences/service');
 
@@ -105,7 +103,7 @@ export function main(options, callbacks){
         build: ooiPanelBuild
     });*/
 
-    console.log('OoI addon loaded without error');
+    console.info('OoI addon loaded');
 }
 
 function onUnload(reason) {
