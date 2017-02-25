@@ -304,7 +304,7 @@ function traverseGraph(window, graph) {
     var done = new Set();
     var todo = new Set();
 
-    var windowProxyDebuggeeObject = globalDebugObject.getOwnPropertyDescriptor('window').value;
+    var windowProxyDebuggeeObject = globalDebugObject.getOwnPropertyDescriptor('window').get.call(globalDebugObject).return;
     windowProxyDebuggeeObject.root = true;
 
     todo.add(windowProxyDebuggeeObject);
@@ -432,9 +432,11 @@ function traverseGraph(window, graph) {
 }
 
 
-/*console.time('preScriptGraph');
+var tabGlobal = content;
+
+console.time('preScriptGraph');
 var preScriptGraph = new SimpleGraph();
-traverseGraph(content, preScriptGraph);
+traverseGraph(tabGlobal, preScriptGraph);
 console.timeEnd('preScriptGraph');
 
-console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges')*/
+console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges')
