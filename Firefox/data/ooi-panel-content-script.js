@@ -8,13 +8,15 @@ const {content, addMessageListener, sendAsyncMessage, removeMessageListener} = t
 addMessageListener('graph-arrived', e => {
     console.log('In ooi panel content script, event', 'graph-arrived');
 
+    var a = new Uint8Array(4);
+    a.fill(25);
+    a[1] = 37;
+
+    console.log(a);
+
     const event = new content.MessageEvent('message', {
-        bubbles: true,
-        cancelable: true,
-        data: 'YOIOIOIOIO',
-        origin: 'oRiGiN',
-        target: content,
-        source: content,
+        //data: JSON.stringify({nodes: [{a: 37}, {b: 2}]}),
+        data: a
     });
 
     content.dispatchEvent(event);
