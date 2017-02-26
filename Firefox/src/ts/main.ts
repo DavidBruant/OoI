@@ -44,7 +44,7 @@ var setTimeout = setTimeoutExport.setTimeout;
 
 
 var OOI_PANEL_ID = 'ooi';
-var OOI_PANEL_ID_READY_EVENT = OOI_PANEL_ID+'-ready';
+var OOI_PANEL_ID_READY_EVENT = OOI_PANEL_ID + '-ready';
 
 
 // For whatever reason, there is no console available in this addon (wtf!)
@@ -114,22 +114,29 @@ export function main(options, callbacks) {
             // Send content script to ooi panel
             var ooiPanel = new OoIPanel();
 
-            toolbox.on(OOI_PANEL_ID_READY_EVENT, function(ev){
-                console.log(OOI_PANEL_ID_READY_EVENT, 'event', arguments);
+            toolbox.on(OOI_PANEL_ID_READY_EVENT, function (ev) {
+                console.log(OOI_PANEL_ID_READY_EVENT, 'event');
 
                 var ooiPanelFrame = frameForPanel(ooiPanel);
                 var ooiPanelMM = ooiPanelFrame.frameLoader.messageManager;
 
                 ooiPanelMM.loadFrameScript(data.url("ooi-panel-content-script.js"), false);
 
+                var a = new Uint8Array(4);
+                a.fill(25);
+                a[1] = 37;
+
+                var json = JSON.stringify({nodes: [{y: 37}]});
+
                 setTimeout(() => {
                     console.log('CHROME - main.ts', 'sending event graph-arrived');
-                    ooiPanelMM.sendAsyncMessage('graph-arrived', 'AHAHAHHAAHAHAH')
+                    ooiPanelMM.sendAsyncMessage('graph-arrived', a);
+                    ooiPanelMM.sendAsyncMessage('graph-arrived', json);
                 }, 1000)
 
             });
 
-            setup(ooiPanel, {window: window, toolbox: toolbox, url: ooiPanel.url});
+            setup(ooiPanel, { window: window, toolbox: toolbox, url: ooiPanel.url });
             ooiPanel.ready();
 
             return ooiPanel;

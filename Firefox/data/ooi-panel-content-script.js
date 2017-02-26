@@ -6,21 +6,10 @@ const {content, addMessageListener, sendAsyncMessage, removeMessageListener} = t
 
 // listen to messages from chrome-side addon and forward to content
 addMessageListener('graph-arrived', e => {
-    console.log('In ooi panel content script, event', 'graph-arrived');
+    console.log('In ooi panel content script, event', e);
 
-    var a = new Uint8Array(4);
-    a.fill(25);
-    a[1] = 37;
-
-    console.log(a);
-
-    const event = new content.MessageEvent('message', {
-        //data: JSON.stringify({nodes: [{a: 37}, {b: 2}]}),
-        data: a
-    });
-
-    content.dispatchEvent(event);
-})
+    content.dispatchEvent( new content.MessageEvent('message', { data: e.data }) );
+});
 
 
 /**

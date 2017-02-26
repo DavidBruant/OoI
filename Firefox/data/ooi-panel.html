@@ -74,10 +74,8 @@
             });
 
             window.addEventListener('message', e => {
-                console.log('message in ooi panel content from content script', e)
                 const data = e.data;
-                console.log('data', data)
-                //console.log('parse data', JSON.parse(data));
+                console.log('message event in ooi panel', data);
             });
 
         </script>
