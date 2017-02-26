@@ -314,7 +314,7 @@ function traverseGraph(window, graph) {
         try  {
             var constructor = proto.getOwnPropertyDescriptor('constructor').value;
         } catch (e) {
-            console.error('constructor is not a data property', proto.getOwnPropertyDescriptor('constructor'), e);
+            //console.error('constructor is not a data property', proto.getOwnPropertyDescriptor('constructor'), e);
             return false;
         }
         return protoProps.length === 1 && constructor === func && proto.proto === debuggeeObjectPrototype;
@@ -431,7 +431,7 @@ var tabGlobal = content;
 
 console.time('preScriptGraph');
 var preScriptGraph = new SimpleGraph();
-traverseGraph(tabGlobal, preScriptGraph);
+//traverseGraph(tabGlobal, preScriptGraph);
 console.timeEnd('preScriptGraph');
 
 console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges');
