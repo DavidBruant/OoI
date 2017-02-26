@@ -29,7 +29,7 @@ var OoiPanel = Class({
     label: "OoI",
     tooltip: "Object of Interest",
     icon: "./icon-16.png",
-    url: "./ooi-panel.html",
+    url: data.url("./ooi-panel.html"),
 
     /**
      * Executed by the framework when an instance of this panel is created.

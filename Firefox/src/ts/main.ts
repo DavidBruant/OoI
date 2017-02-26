@@ -99,7 +99,7 @@ export function main(options, callbacks) {
         id: OOI_PANEL_ID,
         icon: "chrome://browser/skin/devtools/tool-inspector.png",
         // https://github.com/mozilla/mozilla-central/blob/1886faa9e2f7ccede29d0f5696a423997322978b/browser/devtools/framework/toolbox.js#L473
-        url: data.url("devtool-panel.html"),
+        url: "about:blank",
         label: "Object of Interest",
         isTargetSupported: (target => true), // Tool not registered if this function isn't set
         build: function (window, toolbox) {
@@ -129,7 +129,7 @@ export function main(options, callbacks) {
 
             });
 
-            setup(ooiPanel, {window: window, toolbox: toolbox});
+            setup(ooiPanel, {window: window, toolbox: toolbox, url: ooiPanel.url});
             ooiPanel.ready();
 
             return ooiPanel;
