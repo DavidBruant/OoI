@@ -75,7 +75,10 @@
 
             window.addEventListener('message', e => {
                 const data = e.data;
-                console.log('message event in ooi panel', data);
+                console.log('message event in ooi panel', data.length);
+                const graph = JSON.parse(data);
+
+                graphViz.updateGraph(graph.nodes.slice(0, 50), [])
             });
 
         </script>

@@ -47,6 +47,25 @@ var OOI_PANEL_ID = 'ooi';
 var OOI_PANEL_ID_READY_EVENT = OOI_PANEL_ID + '-ready';
 
 
+function ooiPanelMessageManager(toolbox, panel){
+
+    return new Promise(resolve => {
+        toolbox.on(OOI_PANEL_ID_READY_EVENT, function (ev) {
+            console.log(OOI_PANEL_ID_READY_EVENT, 'event');
+
+            var ooiPanelFrame = frameForPanel(panel);
+            var ooiPanelMM = ooiPanelFrame.frameLoader.messageManager;
+
+            ooiPanelMM.loadFrameScript(data.url("ooi-panel-content-script.js"), false);
+
+            resolve(ooiPanelMM);
+        });
+    });
+
+
+}
+
+
 // For whatever reason, there is no console available in this addon (wtf!)
 /*var console = {
  log: function (...args){
@@ -105,39 +124,24 @@ export function main(options, callbacks) {
         build: function (window, toolbox) {
             console.log('OoiTool build');
 
+            var ooiPanel = new OoIPanel();
+            setup(ooiPanel, { window: window, toolbox: toolbox, url: ooiPanel.url });
+            ooiPanel.ready();
+
             // Send content script to tab
             var correspondingTabMM = toolbox.target.tab.linkedBrowser.frameLoader.messageManager;
             correspondingTabMM.loadFrameScript(data.url("tab-content-script.js"), false);
 
-            correspondingTabMM.addMessageListener('graph', m => (m.data))
-
             // Send content script to ooi panel
-            var ooiPanel = new OoIPanel();
+            var ooiPanelMMP = ooiPanelMessageManager(toolbox, ooiPanel);
 
-            toolbox.on(OOI_PANEL_ID_READY_EVENT, function (ev) {
-                console.log(OOI_PANEL_ID_READY_EVENT, 'event');
-
-                var ooiPanelFrame = frameForPanel(ooiPanel);
-                var ooiPanelMM = ooiPanelFrame.frameLoader.messageManager;
-
-                ooiPanelMM.loadFrameScript(data.url("ooi-panel-content-script.js"), false);
-
-                var a = new Uint8Array(4);
-                a.fill(25);
-                a[1] = 37;
-
-                var json = JSON.stringify({nodes: [{y: 37}]});
-
-                setTimeout(() => {
-                    console.log('CHROME - main.ts', 'sending event graph-arrived');
-                    ooiPanelMM.sendAsyncMessage('graph-arrived', a);
-                    ooiPanelMM.sendAsyncMessage('graph-arrived', json);
-                }, 1000)
-
+            // hook events between contexts
+            correspondingTabMM.addMessageListener('graph', m => {
+                var graph = m.data;
+                ooiPanelMMP.then(ooiPanelMM => {
+                    ooiPanelMM.sendAsyncMessage('graph-arrived', graph);
+                })
             });
-
-            setup(ooiPanel, { window: window, toolbox: toolbox, url: ooiPanel.url });
-            ooiPanel.ready();
 
             return ooiPanel;
         }

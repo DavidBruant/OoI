@@ -431,11 +431,11 @@ var tabGlobal = content;
 
 console.time('preScriptGraph');
 var preScriptGraph = new SimpleGraph();
-//traverseGraph(tabGlobal, preScriptGraph);
+traverseGraph(tabGlobal, preScriptGraph);
 console.timeEnd('preScriptGraph');
 
 console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges');
 
 // forwarding graph
 
-sendAsyncMessage('graph', preScriptGraph);
+sendAsyncMessage('graph', JSON.stringify(preScriptGraph));
