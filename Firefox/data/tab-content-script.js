@@ -56,10 +56,7 @@ var SimpleGraph = (function () {
         this.roots.forEach(function (r) {
             return getIndex(r);
         });
-        rootIndices = [];
-        nodes.forEach(function (root, i) {
-            return rootIndices.push(i);
-        });
+        rootIndices = nodes.map((_, i) => i);
 
         this.edges.forEach(function (e) {
             var label;
@@ -93,8 +90,6 @@ var SimpleGraph = (function () {
             rootIndices: rootIndices,
             nodes: nodes
         };
-
-        console.log('JSON.stringify(serializable).length', JSON.stringify(serializable).length);
 
         return serializable;
     };
@@ -439,4 +434,8 @@ var preScriptGraph = new SimpleGraph();
 traverseGraph(tabGlobal, preScriptGraph);
 console.timeEnd('preScriptGraph');
 
-console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges')
+console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges');
+
+// forwarding graph
+
+sendAsyncMessage('graph', preScriptGraph);
