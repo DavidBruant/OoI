@@ -60,27 +60,6 @@ var OoiPanel = Class({
 
     onReady: function () {
         console.log("OoiPanel.onReady ", this.debuggee);
-        // This is the way how to get access to the inner <iframe> element.
-        // The frame is using type="content" and so, the access to the inner
-        // document must be done through a message manager.
-        /*this.panelFrame = viewFor(this);
-
-        // Get frame's message manager. Read more about message managers on MDN:
-        // https://developer.mozilla.org/en-US/Firefox/Multiprocess_Firefox/The_message_manager
-        var messageManager = this.panelFrame.frameLoader.messageManager;
-        messageManager.addMessageListener("message/from/content", this.onMessage);
-
-        // Load helper frame script with content API for receiving
-        // and sending messages.
-
-        [
-            "dirty.js"
-        ]
-        .map( path => data.url(path) )
-        .forEach(url => messageManager.loadFrameScript(url, false))*/
-
-        // Send test message to the content
-        //this.postContentMessage("<message-id>", "Hello from chrome scope!");
 
     },
 

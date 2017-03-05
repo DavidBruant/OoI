@@ -5,11 +5,6 @@
 
 "use strict";
 
-/*throw `TODO
-* Fix data structure so something can be displayed
-* Cleanup unused files (even TS; everything will be re-added when addressing TS task)
-`*/
-
 
 import self = require("sdk/self");
 var data = self.data;
@@ -62,24 +57,6 @@ function ooiPanelMessageManager(toolbox, panel){
 
 }
 
-
-// For whatever reason, there is no console available in this addon (wtf!)
-/*var console = {
- log: function (...args){
- var argsStr = args.map((a)=>String(a)).join(' ');
- setTimeout( () => {throw new Error(argsStr)} , 10);
- }
- };*/
-
-
-
-/*var devtoolsHooksExport = require("./devtoolsHooks.js");
-var devtoolsHooks = devtoolsHooksExport.hooks;*/
-
-/**
- * Application entry point. Read MDN to learn more about Add-on SDK:
- * https://developer.mozilla.org/en-US/Add-ons/SDK
- */
 
 
 export function main(options, callbacks) {
@@ -143,22 +120,11 @@ export function main(options, callbacks) {
         }
     });
 
-    /*gDevTools.on("toolbox-created", function (e, toolbox){
-        console.log("gDevTools.on(toolbox-created)", toolbox);
-        toolbox.on(OOI_PANEL_ID_INIT_EVENT, (ev, iframe) => {
-            console.log(OOI_PANEL_ID_INIT_EVENT, 'event', iframe);
-        })
-    });*/
-
-    /*devtoolsHooks.initialize(g => {
-        console.log('graph in main', g);
-    });*/
-
     console.info('OoI addon loaded');
 }
 
 function onUnload(reason) {
-    devtoolsHooks.shutdown(reason);
+    //devtoolsHooks.shutdown(reason);
 }
 
 // Exports from this module
