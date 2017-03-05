@@ -61,27 +61,6 @@ function ooiPanelMessageManager(toolbox, panel){
 
 export function main(options, callbacks) {
 
-    // enable browser toolbox https://developer.mozilla.org/en-US/docs/Tools/Browser_Toolbox
-    if (staticArgs['browser-toolbox']) {
-        prefs.set("devtools.chrome.enabled", true);
-        prefs.set("devtools.debugger.remote-enabled", true);
-    }
-
-    // make chrome code faster 
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=907201
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=929374
-    // https://bugzilla.mozilla.org/attachment.cgi?id=820210&action=diff
-    if (staticArgs['faster-chrome']) {
-        prefs.set("javascript.options.ion.chrome", true);
-        prefs.set("javascript.options.typeinference.chrome", true);
-
-        // disable all data upload in dev because it spits out useless warning messages. Pollutes the console.
-        // useless data for Mozilla anyway
-        // https://bugzilla.mozilla.org/show_bug.cgi?id=1195552#c4
-        prefs.set('datareporting.policy.dataSubmissionEnabled', false);
-    }
-
-
     gDevTools.registerTool({
         id: OOI_PANEL_ID,
         icon: "chrome://browser/skin/devtools/tool-inspector.png",
