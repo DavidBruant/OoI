@@ -1,4 +1,4 @@
-declare module "self" {
+declare module "sdk/self" {
     export var data: SelfData;
 }
 

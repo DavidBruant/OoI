@@ -2,38 +2,93 @@
 /// <reference path="./defs/jetpack-promise.d.ts" />
 /// <reference path="./defs/jetpack-chrome.d.ts" />
 
-import jetpackPromise = require('sdk/core/promise');
 import chrome = require('chrome')
 
-var Cu = chrome.Cu;
+import self = require("sdk/self");
+var data = self.data;
 
-var EventEmitter = Cu.import("resource:///modules/devtools/shared/event-emitter.js", {}).EventEmitter;
+import EventTargetModule = require('sdk/event/target');
+var EventTarget = EventTargetModule.EventTarget
 
-var defer = jetpackPromise.defer;
+var PanelExport = require("dev/panel.js");
+var Panel = PanelExport.Panel;
+var ClassExport = require("sdk/core/heritage");
+var Class = ClassExport.Class;
+var ToolExport = require("dev/toolbox");
+var Tool = ToolExport.Tool;
+var coreExport = require("sdk/view/core");
+var viewFor = coreExport.viewFor;
 
-class OoIPanel /* +should implements JetPackEventTarget*/{
-    constructor(
-        public panelWin : HTMLIFrameElement,
-        public _toolbox : DevToolsToolbox)
-    {
-        EventEmitter.decorate(this);
-    }
 
-    get target() { return this._toolbox.target; }
+/**
+ * This object represents a new {@Toolbox} panel
+ */
+var OoiPanel = Class({
+    extends: Panel,
 
-    open(){
-        var def = defer();
-        // returning undefined may be the cause of a Devtools bug. Investigate. Return a JetpackPromise<Panel>
-        // https://github.com/mozilla/mozilla-central/blob/91dff2cc04601096b2481081faec21b5aab62a15/browser/devtools/framework/toolbox.js#L463
+    label: "OoI",
+    tooltip: "Object of Interest",
+    icon: "./icon-16.png",
+    url: data.url("./ooi-panel.html"),
 
-        def.resolve(this);
+    /**
+     * Executed by the framework when an instance of this panel is created.
+     * There is one instance of this panel per {@Toolbox}. The panel is
+     * instantiated when selected in the toolbox for the first time.
+     */
+    initialize: function (options) {
+    },
 
-        return def.promise;
-    }
+    /**
+     * Executed by the framework when the panel is destroyed.
+     */
+    dispose: function () {
+    },
 
-    destroy(){
+    /**
+     * Executed by the framework when the panel content iframe is
+     * constructed. Allows e.g to connect the backend through
+     * `debuggee` object
+     */
+    setup: function () {
+        console.log("OoiPanel.setup");
 
-    }
-}
+        //this.debuggee = options.debuggee;
 
-export = OoIPanel
+        return this;
+    },
+
+    onReady: function () {
+        console.log("OoiPanel.onReady ", this.debuggee);
+
+    },
+
+    // Chrome <-> Content Communication
+
+    /**
+     * Handle messages coming from the content scope (see 'frame-script.js'
+     * that is responsible for sending them).
+     */
+    onMessage: function(message) {
+        var d = message.data;
+        var type = d.type
+        var data = d.data;
+
+        console.log("Message from content: ", data);
+    },
+
+    /**
+     * Send message to the content scope (see 'frame-script.js'
+     * that is responsible for handling them).
+     */
+    postContentMessage: function(type, data) {
+        var messageManager = this.panelFrame.frameLoader.messageManager;
+        messageManager.sendAsyncMessage("message/from/chrome", {
+            type: type,
+            data: data,
+        });
+    },
+});
+
+
+export = OoiPanel

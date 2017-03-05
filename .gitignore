@@ -1,3 +1,8 @@
 .idea
-basegruntfile.js
 tasks
+node_modules
+*.xpi
+Firefox/lib/*.js
+Firefox/lib/*.js.map
+Firefox/lib/defs/*.js
+Firefox/lib/defs/*.js.map

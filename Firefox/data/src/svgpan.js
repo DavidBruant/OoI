@@ -65,7 +65,7 @@
  * authors and should not be interpreted as representing official policies, either expressed
  * or implied, of Andrea Leofreddi.
  */
-(function(global){
+function svgpan(){
     "use strict";
 
     /// CONFIGURATION
@@ -223,7 +223,6 @@
         e.preventDefault();
 
         var g = zoomRoot;
-        console.log('typeof g.getCTM', g, typeof g.getCTM);
 
         if(
             e.target.tagName == "svg"
@@ -261,4 +260,4 @@
 
 
 
-})(this);
+}
