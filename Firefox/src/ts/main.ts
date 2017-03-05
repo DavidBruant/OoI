@@ -6,11 +6,8 @@
 "use strict";
 
 /*throw `TODO
-* Create a first graph only when the ooi panel opens.
-    * when the ooi panel opens, remember the toolbox
-    * when a graph is asked, forward to tab frame content script message manager (link with weakmap this mm && toolbox)
-    * get the graph, forward it back to the ooi panel
-    * display
+* Fix data structure so something can be displayed
+* Cleanup unused files (even TS; everything will be re-added when addressing TS task)
 `*/
 
 
@@ -108,12 +105,6 @@ export function main(options, callbacks) {
     }
 
 
-    /*throw `TODO call gDevTools.registerTool myself to access the toolbox
-    https://github.com/mozilla/gecko-dev/blob/master/addon-sdk/source/lib/dev/toolbox.js#L49
-
-    used to anyway https://github.com/DavidBruant/OoI/blob/master/Firefox/src/ts/main.ts#L60
-    `*/
-
     gDevTools.registerTool({
         id: OOI_PANEL_ID,
         icon: "chrome://browser/skin/devtools/tool-inspector.png",
@@ -134,6 +125,11 @@ export function main(options, callbacks) {
 
             // Send content script to ooi panel
             var ooiPanelMMP = ooiPanelMessageManager(toolbox, ooiPanel);
+            ooiPanelMMP.then(ooiPanelMM => {
+                ooiPanelMM.addMessageListener('ask-for-graph', e => {
+                    correspondingTabMM.sendAsyncMessage('compute-graph-now');
+                })
+            })
 
             // hook events between contexts
             correspondingTabMM.addMessageListener('graph', m => {

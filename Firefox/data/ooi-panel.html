@@ -71,6 +71,10 @@
             document.addEventListener('DOMContentLoaded', e => {
                 force(this)
                 svgpan()
+
+                document.querySelector('button').addEventListener('click', e => {
+                    window.dispatchEvent(new CustomEvent('ask-for-graph', {bubbles: true}));
+                })
             });
 
             window.addEventListener('message', e => {

@@ -2,6 +2,8 @@
 
 console.log('tab-content-script');
 
+const {content, addMessageListener, sendAsyncMessage, removeMessageListener} = this;
+
 
 /*
     For now, huge parts are copy/pasted from previous scripts.
@@ -429,13 +431,20 @@ function traverseGraph(window, graph) {
 
 var tabGlobal = content;
 
-console.time('preScriptGraph');
-var preScriptGraph = new SimpleGraph();
-traverseGraph(tabGlobal, preScriptGraph);
-console.timeEnd('preScriptGraph');
 
-console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges');
 
-// forwarding graph
+addMessageListener('compute-graph-now', e => {
+    console.log('tab script received', 'compute-graph-now');
 
-sendAsyncMessage('graph', JSON.stringify(preScriptGraph));
+    console.time('preScriptGraph');
+    var preScriptGraph = new SimpleGraph();
+    traverseGraph(tabGlobal, preScriptGraph);
+    console.timeEnd('preScriptGraph');
+
+    console.log('graph sizes', preScriptGraph.nodes.size, 'nodes', preScriptGraph.edges.size, 'edges');
+
+    // forwarding graph
+
+    sendAsyncMessage('graph', JSON.stringify(preScriptGraph));
+})
+
