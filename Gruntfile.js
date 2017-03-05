@@ -3,15 +3,9 @@
 module.exports = function(grunt) {
 
 	grunt.initConfig({
-        xpi: {
-            // TODO create xpi task
-        },
-        "cfx-test": {
-            // cfx -b /home/david/Logiciel/aurora/firefox run ooi.xpi
-        },
 		typescript: {
 			base: {
-				src: ['**/*.ts'],
+				src: ['Firefox/src/ts/*.ts'],
 				dest: 'Firefox/lib',
 				options: {
 					module: 'commonjs',
@@ -21,20 +15,6 @@ module.exports = function(grunt) {
 					declaration: true
 				}
 			}
-		},
-		watch: {
-			typescript:{
-				files: 'Firefox/src/ts/**/*.ts',
-				tasks: ['typescript'],
-				options: {
-					nospawn: true
-				}
-			}
-//          ,
-//            xpi:{
-//                files: 'Firefox/**/*',
-//                tasks: ['xpi']
-//            }
 		}
 	});
 
