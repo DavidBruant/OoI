@@ -5,9 +5,9 @@ var SimpleGraph = (function () {
         this.edges = new Set();
     }
     SimpleGraph.prototype.toJSON = function () {
-        var rootIndices = [];
-        var nodes = [];
-
+        const nodes = [];
+        const edges = []
+        
         var getIndex = (function () {
             var wm = new WeakMap();
 
@@ -17,7 +17,7 @@ var SimpleGraph = (function () {
 
                 if (index === undefined) {
                     index = nodes.length;
-                    serializableNode = { outgoingEdges: [] };
+                    serializableNode = {};
 
                     if (n.callable)
                         serializableNode.class = 'function';
@@ -73,8 +73,8 @@ var SimpleGraph = (function () {
         });
 
         var serializable = {
-            rootIndices: rootIndices,
-            nodes: nodes
+            nodes: nodes,
+            edges: edges
         };
 
         console.log('JSON.stringify(serializable).length', JSON.stringify(serializable).length);

@@ -27,7 +27,7 @@ function force(global){
 
     var graphBSPTree;
 
-    var moveItems = (function(){
+    /*var moveItems = (function(){
         var todoNode = 0;
         var todoLink = 0;
         var MAX_NODES = 150;
@@ -44,13 +44,13 @@ function force(global){
                 //console.log('n', n.__data__);
                 var circle = n.querySelector('circle');
 
-                circle.setAttribute('cx', n.__data__.x);
-                circle.setAttribute('cy', n.__data__.y);
+                circle.setAttribute('cx', n.x);
+                circle.setAttribute('cy', n.y);
 
                 var text = n.querySelector('text');
                 if(text){
-                    text.setAttribute('x', n.__data__.x);
-                    text.setAttribute('y', n.__data__.y);
+                    text.setAttribute('x', n.x);
+                    text.setAttribute('y', n.y);
                 }
             }
 
@@ -102,7 +102,7 @@ function force(global){
             }
         };
 
-    })();
+    })();*/
 
     var ticks = []
 
@@ -145,6 +145,8 @@ function force(global){
 
         node = node.data(nodes);
 
+        console.log('nodes, node', nodes, node);
+
         var nodeEnterG = node.enter().insert("g");
 
         nodeEnterG.on('click', e => {
@@ -162,14 +164,11 @@ function force(global){
                     ret.push('expanded');
                 return ret.join(' ')
             })
-            .attr("r", n => Array.isArray(n.dataNode.outgoingEdges) && !n.expanded ?
-                                7 + Math.sqrt(n.dataNode.outgoingEdges.length)/5 :
-                                5
-            )
+            .attr("r", n => 7)
         
         //throw Error('add click handler and react to the marker saying whether the node is expanded');
 
-        nodeEnterG.filter(n => {
+        /*nodeEnterG.filter(n => {
                 return Array.isArray(n.dataNode.outgoingEdges) && !n.expanded;
             })
             .append('text')
@@ -179,11 +178,12 @@ function force(global){
             .text(n => {
                 return String(n.dataNode.outgoingEdges.length)
             }); 
+            */
 
-
-        force.start();
+       /* force.start();
         for (var i = 4; i > 0; --i)
             force.tick(); // do a couple iterations to begin with
+            */
     }
 
     var svg = d3.select("body").append("svg")
@@ -395,25 +395,12 @@ function force(global){
         latestMouseMoveEvent = e;
     });
 
-    // draws what it's asked for without thinking too much about it
-    global.graphViz = {
-        updateGraph: function(newNodes, newEdges){
-            console.log('updateGraph', newNodes, newEdges)
+    global.graphViz = function(newNodes, newEdges){
+        nodes = newNodes;
+        links = newEdges;
 
-            // waiting for https://bugzilla.mozilla.org/show_bug.cgi?id=762363
-            Array.prototype.push.apply(nodes, newNodes);
-            Array.prototype.push.apply(links, newEdges);
-
-            restart();
-        },
-        empty: () => {
-            throw 'TODO';
-            nodes = [];
-            links = [];
-            restart();
-        }
+        restart();
     };
-
 };
 
 /**

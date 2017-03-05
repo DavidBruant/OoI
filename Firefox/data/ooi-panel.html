@@ -73,6 +73,7 @@
                 svgpan()
 
                 document.querySelector('button').addEventListener('click', e => {
+                    console.time('graph RT')
                     window.dispatchEvent(new CustomEvent('ask-for-graph', {bubbles: true}));
                 })
             });
@@ -82,7 +83,8 @@
                 console.log('message event in ooi panel', data.length);
                 const graph = JSON.parse(data);
 
-                graphViz.updateGraph(graph.nodes.slice(0, 50), [])
+                graphViz(graph.nodes.slice(0, 50), [])
+                console.timeEnd('graph RT')
             });
 
         </script>
