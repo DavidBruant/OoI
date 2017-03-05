@@ -5,15 +5,13 @@
   "author": "David Bruant",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc --outDir Firefox/lib --sourcemap -t ES5 -m commonjs ./Firefox/src/ts/*.ts",
+    "start": "jpm --addon-dir Firefox -b /home/david/Logiciel/aurora/firefox --debug run",
+    "xpi": "jpm --addon-dir Firefox xpi"
   },
   "dependencies": {
-    "jpm": "^1.3.0"
-  },
-  "devDependencies": {
-    "grunt-typescript": "~0.2.7",
-    "typescript": "~0.9.0",
-    "grunt-contrib-watch": "~0.4.4"
+    "jpm": "^1.3.0",
+    "typescript": "~0.9.0"
   },
   "license": "MIT",
   "version": "0.1.0"
