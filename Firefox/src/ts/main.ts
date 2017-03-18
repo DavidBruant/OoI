@@ -31,6 +31,8 @@ var gDevTools = devtoolsExport.gDevTools;
 import setTimeoutExport = require("sdk/timers");
 var setTimeout = setTimeoutExport.setTimeout;
 
+//import devtoolsHooks from './devtoolsHooks';
+
 
 var OOI_PANEL_ID = 'ooi';
 var OOI_PANEL_ID_READY_EVENT = OOI_PANEL_ID + '-ready';
