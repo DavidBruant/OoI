@@ -4,8 +4,12 @@
         "outDir": "./Firefox/lib",
         "target": "ES2016",
         "noImplicitAny": true,
+        "noUnusedLocals": true,
         "removeComments": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "suppressExcessPropertyErrors": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "strictNullChecks": true
     },
     "include": [
         "./Firefox/src/ts/*.ts"
