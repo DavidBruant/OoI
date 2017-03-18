@@ -5,11 +5,7 @@
         "target": "ES2016",
         "noImplicitAny": true,
         "removeComments": true,
-        "sourceMap": true,
-        "typeRoots" : [
-            "./Firefox/src/ts/defs/typings",
-            "node_modules/@types"
-        ]
+        "sourceMap": true
     },
     "include": [
         "./Firefox/src/ts/*.ts"

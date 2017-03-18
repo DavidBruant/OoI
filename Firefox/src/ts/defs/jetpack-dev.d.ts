@@ -1,11 +1,13 @@
-declare module 'dev/panel'{
-    export class Panel{
+interface Panel{
+}
 
-    }
+interface Tool{
+}
+
+declare module 'dev/panel'{
+    export const Panel: Panel
 }
 
 declare module 'dev/toolbox'{
-    export class Tool{
-
-    }
+    export const Tool: Tool
 }
