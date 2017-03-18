@@ -2,6 +2,14 @@
 /// <reference path="./defs/jetpack-timers.d.ts" />
 /// <reference path="./defs/jetpack-self.d.ts" />
 /// <reference path="./defs/jetpack-system-events.d.ts" />
+/// <reference path="./defs/jetpack-core-heritage.d.ts" />
+/// <reference path="./defs/jetpack-promise.d.ts" />
+/// <reference path="./defs/jetpack-chrome.d.ts" />
+/// <reference path="./defs/jetpack-dev.d.ts" />
+/// <reference path="./defs/jetpack-sdk-view-core.d.ts" />
+/// <reference path="./defs/jetpack-event-core.d.ts" />
+/// <reference path="./defs/jetpack-tabs-utils.d.ts" />
+
 
 "use strict";
 

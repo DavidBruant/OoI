@@ -16,7 +16,3 @@ A little addon to visualize object graphs in Firefox.
 # Licence
 
 [MIT](./licence)
-
-# Random stuffs
-
-`../node_modules/.bin/jpm -b /home/david/Logiciel/aurora/firefox --debug run`
