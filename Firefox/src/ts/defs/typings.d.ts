@@ -1,3 +1,4 @@
+/// <reference path="SpiderMonkey.d.ts" />
 /// <reference path="Debugger.d.ts" />
 /// <reference path="e10s.d.ts" />
 /// <reference path="devtools.d.ts" />

@@ -4,7 +4,8 @@ declare module "chrome" {
 
 interface ComponentsUtils{
     // the 'to' argument is optional, but it's very a good practice to add an empty object as argument
-    import(path: string, to: Object): any
+    import(path: string, to: Object): any,
+    import(path: "resource://gre/modules/reflect.jsm", {}): SpiderMonkeyReflect
 }
 
 
