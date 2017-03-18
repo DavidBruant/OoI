@@ -1,8 +1,6 @@
-import {Cu} from 'chrome'
 import {data} from 'sdk/self';
 import {Panel} from 'dev/panel';
 import {Class} from 'sdk/core/heritage';
-import {Tool} from 'dev/toolbox';
 
 
 /**
