@@ -6,7 +6,7 @@ import {Class} from 'sdk/core/heritage';
 /**
  * This object represents a new {@Toolbox} panel
  */
-var OoiPanel = new Class({
+export default new Class({
     extends: Panel,
 
     label: "OoI",
@@ -58,7 +58,4 @@ var OoiPanel = new Class({
             data: data,
         });
     },
-});
-
-
-export = OoiPanel
+})
