@@ -7,7 +7,3 @@ declare module "sdk/tabs" {
 interface SdkTab{
     id: number
 }
-
-interface TabsStatics extends JetPackEventTarget{
-
-}

@@ -1,3 +1,4 @@
+
 declare module 'sdk/view/core'{
-    export function  viewFor()
+    export function viewFor(p: Panel): Frame
 }

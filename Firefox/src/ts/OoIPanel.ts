@@ -1,10 +1,8 @@
 import {Cu} from 'chrome'
 import {data} from 'sdk/self';
-import {EventTarget} from 'sdk/event/target';
 import {Panel} from 'dev/panel';
 import {Class} from 'sdk/core/heritage';
 import {Tool} from 'dev/toolbox';
-import {viewFor} from 'sdk/view/core';
 
 
 /**
