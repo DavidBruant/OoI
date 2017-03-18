@@ -1,27 +1,27 @@
-"use strict";
-
-import chr = require("chrome");
-var Cu = chr.Cu;
+import {Cu} from 'chrome';
 
 //console.log('typeof this.Reflect', typeof this.Reflect);
 var Reflect = Cu.import("resource://gre/modules/reflect.jsm", {}).Reflect;
 //console.log('typeof this.Reflect', typeof this.Reflect);
 
-function getObjectCreationsLocations(src){
+function getObjectCreationsLocations(src: string){
 
     var root = Reflect.parse(src);
 
-    var result = [];
+    var result : Array<{
+        newObject?: SpiderMonkeyASTNode,
+        newEdge?: SpiderMonkeyASTNode
+    }> = [];
     result.toString = function(){
         return JSON.stringify(this, null, 3);
     };
 
 
-    function isObject(x){
+    function isObject(x: any){
         return Object(x) === x;
     }
 
-    function traverse(node){
+    function traverse(node: SpiderMonkeyASTNode){
 
         if(isObject(node) && ('type' in node || Array.isArray(node))){
             if(node.type) console.log('node', node.type, node);
