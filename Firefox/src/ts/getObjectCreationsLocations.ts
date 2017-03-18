@@ -1,10 +1,10 @@
 import {Cu} from 'chrome';
 
 //console.log('typeof this.Reflect', typeof this.Reflect);
-var Reflect = Cu.import("resource://gre/modules/reflect.jsm", {}).Reflect;
+const Reflect = Cu.import("resource://gre/modules/reflect.jsm", {}).Reflect;
 //console.log('typeof this.Reflect', typeof this.Reflect);
 
-function getObjectCreationsLocations(src: string){
+export default function getObjectCreationsLocations(src: string){
 
     var root = Reflect.parse(src);
 
@@ -65,5 +65,3 @@ function getObjectCreationsLocations(src: string){
     return result;
 
 }
-
-export = getObjectCreationsLocations

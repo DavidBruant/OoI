@@ -1,4 +1,4 @@
-interface Toolbox{
+interface Toolbox extends EventEmitter{
     target: DevtoolTarget
 }
 

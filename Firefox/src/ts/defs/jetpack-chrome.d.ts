@@ -10,7 +10,7 @@ interface ComponentsUtils{
 
 
 
-declare class EventEmitter{
+interface EventEmitter{
     on(eventName: string, listener:(e: string)=>void) : void 
     once(eventName: string, listener:(e: string)=>void) : void
     off(eventName: string, listener:(e: string)=>void) : void

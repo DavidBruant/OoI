@@ -1,5 +1,10 @@
+
 declare module 'sdk/core/heritage'{
     export class Class{
-        constructor(params: any);
+        constructor(desc: {
+            extends: any
+        })
+
+        new(...args: any[]): any
     }
 }

@@ -1,4 +1,5 @@
 interface Panel{
+    url: string
 }
 
 interface Tool{
