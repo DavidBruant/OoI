@@ -1,11 +1,11 @@
+/// <reference path="../defs/e10s.d.ts" />
+
 'use strict';
 
 console.log('ooi-panel-content-script');
 
-const {content, addMessageListener, sendAsyncMessage, removeMessageListener} = this;
-
 // listen to messages from chrome-side addon and forward to content
-addMessageListener('graph-arrived', e => {
+addMessageListener('graph-arrived', (e: MessageManagerMessage) => {
     console.log('In ooi panel content script, event', e);
 
     content.dispatchEvent(new content.MessageEvent('message', { data: e.data }));
