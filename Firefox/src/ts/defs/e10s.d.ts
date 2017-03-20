@@ -2,6 +2,8 @@
     Machinery related to e10s
 */
 
+// Chrome context
+
 interface Frame{
     frameLoader: FrameLoader
 }
@@ -24,6 +26,15 @@ interface MessageManagerMessage{
     data: any
 }
 
-interface Window{
-    
+// Frame script 
+
+interface FrameScriptContentWindow extends Window{
+    MessageEvent: any
 }
+
+declare const addMessageListener: (eventName: string, listener : (m: MessageManagerMessage) => void) => void;
+declare const content: FrameScriptContentWindow;
+declare const sendAsyncMessage: (eventName: string, data?: any) => void;
+declare const removeMessageListener: (eventName: string, listener : (m: MessageManagerMessage) => void) => void
+
+declare function addEventListener(eventName: string, listener : (m: MessageManagerMessage) => void, opts: any) : void

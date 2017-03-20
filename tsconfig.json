@@ -9,7 +9,11 @@
         "sourceMap": true,
         "suppressExcessPropertyErrors": true,
         "suppressImplicitAnyIndexErrors": true,
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "lib": [
+            "dom",
+            "es2016"
+        ]
     },
     "include": [
         "./Firefox/src/ts/*.ts"

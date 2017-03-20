@@ -13,4 +13,5 @@
 /// <reference path="jetpack-system-events.d.ts" />
 /// <reference path="jetpack-tabs-utils.d.ts" />
 
+/// <reference path="Graph.d.ts" />
 /// <reference path="ooi.d.ts" />

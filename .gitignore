@@ -10,3 +10,5 @@ Firefox/lib/*.js
 Firefox/lib/*.js.map
 Firefox/lib/defs/*.js
 Firefox/lib/defs/*.js.map
+
+Firefox/data/ooi-panel-content-script.js

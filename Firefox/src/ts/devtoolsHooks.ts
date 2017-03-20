@@ -5,7 +5,7 @@ const {gDevTools} = Cu.import("resource://devtools/client/framework/gDevTools.js
 
 export default {
 
-    initialize: function (onGraph: (g: Graph) => void) {
+    initialize: function (onGraph: (g: Graph<any, any>) => void) {
         this.onToolboxCreated = function(e: any, toolbox: Toolbox) {
             var correspondingTabMM = toolbox.target.tab.linkedBrowser.frameLoader.messageManager;
 
