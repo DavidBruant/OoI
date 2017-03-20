@@ -7,7 +7,7 @@
     "build": "tsc",
     "compile": "tsc Firefox/src/ts/*.ts Firefox/src/ts/**/*.ts --noEmit -t ES2016 --suppressExcessPropertyErrors --noImplicitAny --suppressImplicitAnyIndexErrors --lib es2016,dom",
     "build:main": "tsc",
-    "build:ooi-panel-content-script": "browserify Firefox/src/ts/entrypoints/ooi-panel-content-script.ts -p tsify -o Firefox/data/ooi-panel-content-script.js",
+    "build:ooi-panel-frame-script": "browserify Firefox/src/ts/entrypoints/ooi-panel-frame-script.ts -p tsify -o Firefox/data/ooi-panel-frame-script.js",
     "start": "jpm --addon-dir Firefox -b /home/david/Logiciel/aurora/firefox --debug run",
     "xpi": "jpm --addon-dir Firefox xpi"
   },

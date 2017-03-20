@@ -25,7 +25,7 @@ function ooiPanelMessageManager(toolbox: Toolbox, panel: Panel){
             var ooiPanelFrame = frameForPanel(panel);
             var ooiPanelMM = ooiPanelFrame.frameLoader.messageManager;
 
-            ooiPanelMM.loadFrameScript(data.url("ooi-panel-content-script.js"), false);
+            ooiPanelMM.loadFrameScript(data.url("ooi-panel-frame-script.js"), false);
 
             resolve(ooiPanelMM);
         });
