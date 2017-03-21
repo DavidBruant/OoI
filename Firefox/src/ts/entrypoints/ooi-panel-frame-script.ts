@@ -2,11 +2,11 @@
 
 'use strict';
 
-console.log('ooi-panel-content-script');
+console.log('ooi-panel-frame-script');
 
 // listen to messages from chrome-side addon and forward to content
 addMessageListener('graph-arrived', (e: MessageManagerMessage) => {
-    console.log('In ooi panel content script, event', e);
+    console.log('In ooi panel frame script, event', e);
 
     content.dispatchEvent(new content.MessageEvent('message', { data: e.data }));
 });

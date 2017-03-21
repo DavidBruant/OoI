@@ -21,6 +21,8 @@ declare module Debugger{
         
         callable: boolean
 
+        callee: Environment
+
         // custom
         root : boolean
         byPath(path: string) : Debugger.Object
