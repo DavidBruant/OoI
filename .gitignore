@@ -5,10 +5,10 @@ npm-debug.log
 
 *.xpi
 
-
 Firefox/lib/*.js
 Firefox/lib/*.js.map
 Firefox/lib/defs/*.js
 Firefox/lib/defs/*.js.map
 
-Firefox/data/ooi-panel-content-script.js
+Firefox/data/ooi-panel-frame-script.js
+Firefox/data/tab-frame-script.js

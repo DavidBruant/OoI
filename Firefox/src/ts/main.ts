@@ -54,18 +54,20 @@ export function main() {
 
             // Send content script to tab
             var correspondingTabMM = toolbox.target.tab.linkedBrowser.frameLoader.messageManager;
-            correspondingTabMM.loadFrameScript(data.url("tab-content-script.js"), false);
+            correspondingTabMM.loadFrameScript(data.url("tab-frame-script.js"), false);
 
             // Send content script to ooi panel
             var ooiPanelMMP = ooiPanelMessageManager(toolbox, ooiPanel);
             ooiPanelMMP.then(ooiPanelMM => {
                 ooiPanelMM.addMessageListener('ask-for-graph', () => {
+                    console.log('from chrome', 'ask-for-graph')
                     correspondingTabMM.sendAsyncMessage('compute-graph-now');
                 })
             })
 
             // hook events between contexts
             correspondingTabMM.addMessageListener('graph', m => {
+                console.log('from chrome', 'graph')
                 var graph = m.data;
                 ooiPanelMMP.then(ooiPanelMM => {
                     ooiPanelMM.sendAsyncMessage('graph-arrived', graph);
