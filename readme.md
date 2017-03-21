@@ -6,10 +6,14 @@ A little addon to visualize object graphs in Firefox.
 
 ## dev
 
-1. `npm run build`
-1. `npm start`
+````bash
+npm run typecheck -s
 
-## build the xpi
+npm run build
+npm start
+````
+
+## build the addon package
 
 1. `npm run xpi`
 
