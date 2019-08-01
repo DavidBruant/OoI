@@ -4,5 +4,4 @@ declare module "sdk/self" {
 
 interface SelfData{
     url(id: string) : string
-    load(id: string)
 }

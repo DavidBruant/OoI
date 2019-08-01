@@ -21,18 +21,6 @@ Edges were links between the objects, colors represented the type of link (objec
 ![large graph representing a realm in a new Firefox devtool panel](images/cache.png)
 
 
-
-## Development instructions (irrelevant today)
-
-### dev
-
-1. `npm run build`
-1. `npm start`
-
-### build the xpi
-
-1. `npm run xpi`
-
 # Licence
 
 [MIT](./licence)

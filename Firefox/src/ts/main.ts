@@ -1,54 +1,31 @@
-/// <reference path="./defs/Debugger.d.ts" />
-/// <reference path="./defs/jetpack-timers.d.ts" />
-/// <reference path="./defs/jetpack-self.d.ts" />
-/// <reference path="./defs/jetpack-system-events.d.ts" />
+/// <reference path="./defs/typings.d.ts" />
 
-"use strict";
+import {data} from 'sdk/self';
+import {Cu} from 'chrome';
+import {viewFor as frameForPanel} from 'sdk/view/core';
+import {setup} from 'sdk/core/disposable';
 
+import OoIPanel from './OoIPanel';
+//import devtoolsHooks from './devtoolsHooks';
+//import getObjectCreationsLocations from './getObjectCreationsLocations';
 
-import self = require("sdk/self");
-var data = self.data;
-
-import system = require("sdk/system");
-var staticArgs = system.staticArgs;
-
-import chr = require("chrome");
-var Cu = chr.Cu;
-
-import getObjectCreationsLocations = require('./getObjectCreationsLocations');
-
-import OoIPanel = require('./OoIPanel');
-
-import prefs = require('sdk/preferences/service');
-
-import coreExport = require("sdk/view/core");
-var frameForPanel = coreExport.viewFor;
-
-import disposableExport = require("sdk/core/disposable");
-var setup = disposableExport.setup;
-
-
-var devtoolsExport = Cu.import("resource://devtools/client/framework/gDevTools.jsm", {});
-var gDevTools = devtoolsExport.gDevTools;
-
-import setTimeoutExport = require("sdk/timers");
-var setTimeout = setTimeoutExport.setTimeout;
+const {gDevTools} = Cu.import("resource://devtools/client/framework/gDevTools.jsm", {});
 
 
 var OOI_PANEL_ID = 'ooi';
 var OOI_PANEL_ID_READY_EVENT = OOI_PANEL_ID + '-ready';
 
 
-function ooiPanelMessageManager(toolbox, panel){
+function ooiPanelMessageManager(toolbox: Toolbox, panel: Panel){
 
-    return new Promise(resolve => {
+    return new Promise<MessageManager>(resolve => {
         toolbox.on(OOI_PANEL_ID_READY_EVENT, function (ev) {
             console.log(OOI_PANEL_ID_READY_EVENT, 'event');
 
             var ooiPanelFrame = frameForPanel(panel);
             var ooiPanelMM = ooiPanelFrame.frameLoader.messageManager;
 
-            ooiPanelMM.loadFrameScript(data.url("ooi-panel-content-script.js"), false);
+            ooiPanelMM.loadFrameScript(data.url("ooi-panel-frame-script.js"), false);
 
             resolve(ooiPanelMM);
         });
@@ -59,7 +36,7 @@ function ooiPanelMessageManager(toolbox, panel){
 
 
 
-export function main(options, callbacks) {
+export function main() {
 
     gDevTools.registerTool({
         id: OOI_PANEL_ID,
@@ -67,28 +44,30 @@ export function main(options, callbacks) {
         // https://github.com/mozilla/mozilla-central/blob/1886faa9e2f7ccede29d0f5696a423997322978b/browser/devtools/framework/toolbox.js#L473
         url: "about:blank",
         label: "Object of Interest",
-        isTargetSupported: (target => true), // Tool not registered if this function isn't set
-        build: function (window, toolbox) {
+        isTargetSupported: ((target: DevtoolTarget) => true), // Tool not registered if this function isn't set
+        build: function (window: Window, toolbox: Toolbox) {
             console.log('OoiTool build');
 
-            var ooiPanel = new OoIPanel();
+            var ooiPanel: OoiPanel = (<any>OoIPanel)();
             setup(ooiPanel, { window: window, toolbox: toolbox, url: ooiPanel.url });
             ooiPanel.ready();
 
             // Send content script to tab
             var correspondingTabMM = toolbox.target.tab.linkedBrowser.frameLoader.messageManager;
-            correspondingTabMM.loadFrameScript(data.url("tab-content-script.js"), false);
+            correspondingTabMM.loadFrameScript(data.url("tab-frame-script.js"), false);
 
             // Send content script to ooi panel
             var ooiPanelMMP = ooiPanelMessageManager(toolbox, ooiPanel);
             ooiPanelMMP.then(ooiPanelMM => {
-                ooiPanelMM.addMessageListener('ask-for-graph', e => {
+                ooiPanelMM.addMessageListener('ask-for-graph', () => {
+                    console.log('from chrome', 'ask-for-graph')
                     correspondingTabMM.sendAsyncMessage('compute-graph-now');
                 })
             })
 
             // hook events between contexts
             correspondingTabMM.addMessageListener('graph', m => {
+                console.log('from chrome', 'graph')
                 var graph = m.data;
                 ooiPanelMMP.then(ooiPanelMM => {
                     ooiPanelMM.sendAsyncMessage('graph-arrived', graph);
@@ -102,7 +81,7 @@ export function main(options, callbacks) {
     console.info('OoI addon loaded');
 }
 
-function onUnload(reason) {
+function onUnload(/*reason*/) {
     //devtoolsHooks.shutdown(reason);
 }
 

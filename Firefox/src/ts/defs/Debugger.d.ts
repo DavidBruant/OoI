@@ -1,7 +1,7 @@
 declare class Debugger{
-    constructor(...args)
+    constructor(...args: any[])
     findScripts() : Debugger.Script[]
-    uncaughtExceptionHook(e)
+    uncaughtExceptionHook(e: any) : any
     addDebuggee(global : Global) : Debugger.Object; // returns a Debuggee value for the inner window (Window and not WindowProxy)
 
     static Resumption: any
@@ -21,6 +21,8 @@ declare module Debugger{
         
         callable: boolean
 
+        callee: Environment
+
         // custom
         root : boolean
         byPath(path: string) : Debugger.Object
@@ -36,7 +38,7 @@ declare module Debugger{
     export class Environment{
         parent: Debugger.Environment
         names(): string[]
-        getVariable(v): any
+        getVariable(v: string): any
     }
 
     export class Source{

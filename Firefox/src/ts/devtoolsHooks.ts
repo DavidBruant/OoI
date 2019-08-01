@@ -1,39 +1,23 @@
-/* See license.txt for terms of usage */
+import {Cu} from 'chrome'
+import {data} from 'sdk/self';
 
-"use strict";
+const {gDevTools} = Cu.import("resource://devtools/client/framework/gDevTools.jsm", {});
 
-import chr = require("chrome");
-var Cu = chr.Cu;
+export default {
 
-import self = require("sdk/self");
-var data = self.data;
+    initialize: function (onGraph: (g: Graph<any, any>) => void) {
+        this.onToolboxCreated = function(e: any, toolbox: Toolbox) {
+            var correspondingTabMM = toolbox.target.tab.linkedBrowser.frameLoader.messageManager;
 
-var devtoolsExport = Cu.import("resource://devtools/client/framework/gDevTools.jsm", {});
-var gDevTools = devtoolsExport.gDevTools;
-
-function _onToolboxCreated(onGraph){
-    return function onToolboxCreated(e, toolbox) {
-        var correspondingTabMM = toolbox.target.tab.linkedBrowser.frameLoader.messageManager;
-
-        correspondingTabMM.loadFrameScript(data.url("tab-content-script.js"), false);
-        correspondingTabMM.addMessageListener('graph', m => onGraph(m.data))
-    }
-}
-
-var hooks = {
-    onToolboxCreated: undefined,
-
-    initialize: function (onGraph) {
-        this.onToolboxCreated = _onToolboxCreated(onGraph);
+            correspondingTabMM.loadFrameScript(data.url("tab-content-script.js"), false);
+            correspondingTabMM.addMessageListener('graph', (m: MessageManagerMessage) => onGraph(m.data))
+        };
         gDevTools.on("toolbox-created", this.onToolboxCreated);
     },
 
-    shutdown: function (reason) {
+    shutdown: function () {
         gDevTools.off("toolbox-created", this.onToolboxCreated);
         this.onToolboxCreated = undefined;
-    },
+    }
 
-};
-
-// Exports from this module
-exports.hooks = hooks;
+}

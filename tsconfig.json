@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "outDir": "./Firefox/lib",
+        "target": "ES2016",
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "suppressExcessPropertyErrors": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "strictNullChecks": true,
+        "lib": [
+            "dom",
+            "es2016"
+        ]
+    },
+    "include": [
+        "./Firefox/src/ts/*.ts"
+    ]
+}
