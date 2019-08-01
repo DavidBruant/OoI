@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
     <head>
         <meta charset="utf-8">
@@ -62,32 +62,7 @@
             
         </style>
         
-        <script defer src="d3/d3.v3.js"> </script>
-        <script defer src="src/2DBSP.js"> </script>
-        <script defer src="src/force.js"> </script>
-        <script defer src="src/svgpan.js"> </script>
-        <script>
-            "use strict";
-            document.addEventListener('DOMContentLoaded', e => {
-                force(this)
-                svgpan()
-
-                document.querySelector('button').addEventListener('click', e => {
-                    console.time('graph RT')
-                    window.dispatchEvent(new CustomEvent('ask-for-graph', {bubbles: true}));
-                })
-            });
-
-            window.addEventListener('message', e => {
-                const data = e.data;
-                console.log('message event in ooi panel', data.length);
-                const graph = JSON.parse(data);
-
-                graphViz(graph.nodes.slice(0, 50), [])
-                console.timeEnd('graph RT')
-            });
-
-        </script>
+        <script defer src="./ooi-panel.js"> </script>
     </head>
     
     <body>

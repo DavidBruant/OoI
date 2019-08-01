@@ -1,0 +1,18 @@
+<!doctype html>
+<script>
+"use strict";
+
+function makeLeaker(){
+    let a = [];
+
+    return e => {
+        a.push(e);
+    };
+}
+
+const l = makeLeaker();
+
+// add a new different object every 2 seconds.
+setInterval( () => l({}), 2000);
+// all the objects are effectively unreachable, but no GC is smart enough to figure it out
+</script>

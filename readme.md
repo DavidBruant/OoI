@@ -1,6 +1,6 @@
 # OoI
 
-A little addon to visualize object graphs in Firefox.
+A little addon to visualize tab content memory as a graph in Firefox.
 
 # Make it work
 
@@ -15,7 +15,7 @@ npm start
 
 ## build the addon package
 
-1. `npm run xpi`
+`npm run xpi`
 
 # Licence
 

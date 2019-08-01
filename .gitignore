@@ -12,3 +12,5 @@ Firefox/lib/defs/*.js.map
 
 Firefox/data/ooi-panel-frame-script.js
 Firefox/data/tab-frame-script.js
+
+notes.md

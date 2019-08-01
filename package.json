@@ -8,12 +8,12 @@
     "build": "npm-run-all --parallel build:*",
     "build:main": "tsc",
     "build:ooi-panel-frame-script": "browserify Firefox/src/ts/entrypoints/ooi-panel-frame-script.ts -p tsify -o Firefox/data/ooi-panel-frame-script.js",
+    "build:ooi-panel": "browserify Firefox/src/ts/entrypoints/ooi-panel.ts -p tsify -o Firefox/data/ooi-panel.js",
 
     "build:tab-frame-script": "npm-run-all build-1:tab-frame-script build-2:tab-frame-script",
     
     "build-1:tab-frame-script" : "browserify Firefox/src/ts/entrypoints/tab-frame-script.ts -p tsify -o /tmp/tab-frame-script.js",
     "build-2:tab-frame-script" : "cat Firefox/src/ts/addDebuggerToGlobal.js /tmp/tab-frame-script.js > Firefox/data/tab-frame-script.js",
-    
     
     "start": "jpm --addon-dir Firefox -b /home/david/Logiciel/aurora/firefox --debug run",
     "xpi": "jpm --addon-dir Firefox xpi"
